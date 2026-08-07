@@ -20,7 +20,7 @@ export const COLOR_SWATCHES: Record<string, string> = {
   Grey: "#9aa0a6",
   Silver: "#c9ccd1",
   Gold: "#d4a017",
-  Bronze: "#a濃",
+  Bronze: "#a97142",
   Red: "#c1352b",
   Pink: "#e58bb0",
   Orange: "#e07a2f",
