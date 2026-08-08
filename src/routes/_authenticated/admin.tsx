@@ -171,9 +171,19 @@ function Admin() {
             <p className="text-sm text-primary-foreground/70">{count} costumes in the catalogue</p>
           </div>
           <div className="flex gap-2">
+            <Button
+              size="sm"
+              className="gap-2"
+              disabled={importFromOneDrive.isPending}
+              onClick={() => importFromOneDrive.mutate()}
+            >
+              <CloudDownload className="size-4" />
+              {importFromOneDrive.isPending ? "Importing…" : "Import from OneDrive"}
+            </Button>
             <Button asChild variant="secondary" size="sm">
               <Link to="/">View site</Link>
             </Button>
+
             <Button variant="outline" size="sm" onClick={signOut} className="gap-2">
               <LogOut className="size-4" /> Sign out
             </Button>
