@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CostumeCard } from "@/components/CostumeCard";
 import { FolderCard } from "@/components/FolderCard";
+import { FilterChip } from "@/components/FilterChip";
 import { buildFolderTree, costumesQuery, findFolder } from "@/lib/folders";
+import { swatchStyle } from "@/lib/costumes";
 
 export const Route = createFileRoute("/collection/$folder/$sub")({
   head: ({ params }) => {
@@ -32,6 +34,7 @@ function SubFolderPage() {
   const { folder, sub } = Route.useParams();
   const { data, isLoading } = useQuery(costumesQuery);
   const [visible, setVisible] = useState(60);
+  const [colors, setColors] = useState<string[]>([]);
 
   const { parent, node } = useMemo(() => {
     const tree = buildFolderTree(data ?? []);
@@ -40,6 +43,29 @@ function SubFolderPage() {
       node: findFolder(tree, [folder, sub]),
     };
   }, [data, folder, sub]);
+
+  const colorFacets = useMemo(() => {
+    const set = new Set<string>();
+    for (const item of node?.items ?? []) {
+      item.colors.forEach((c) => set.add(c));
+    }
+    return [...set].sort();
+  }, [node]);
+
+  const filteredItems = useMemo(() => {
+    if (!node) return [];
+    if (!colors.length) return node.items;
+    return node.items.filter((item) =>
+      item.colors.some((c) => colors.includes(c)),
+    );
+  }, [node, colors]);
+
+  useEffect(() => setVisible(60), [colors]);
+
+  const toggleColor = (color: string) =>
+    setColors((prev) =>
+      prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color],
+    );
 
   return (
     <main className="min-h-screen bg-background">
@@ -95,12 +121,53 @@ function SubFolderPage() {
                 ))}
               </div>
             )}
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {node.items.slice(0, visible).map((costume) => (
-                <CostumeCard key={costume.id} costume={costume} />
-              ))}
-            </div>
-            {visible < node.items.length && (
+
+            {colorFacets.length > 0 && (
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-xl">
+                  Photos
+                  {colors.length > 0 && ` — ${filteredItems.length} match`}
+                </h2>
+                {colors.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={() => setColors([])}>
+                    Clear colour filter
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {colorFacets.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {colorFacets.map((c) => (
+                  <FilterChip key={c} active={colors.includes(c)} onClick={() => toggleColor(c)}>
+                    <span
+                      className="size-3.5 rounded-full border border-border"
+                      style={swatchStyle(c)}
+                    />
+                    {c}
+                  </FilterChip>
+                ))}
+              </div>
+            )}
+
+            {filteredItems.length > 0 && (
+              <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredItems.slice(0, visible).map((costume) => (
+                  <CostumeCard key={costume.id} costume={costume} />
+                ))}
+              </div>
+            )}
+
+            {filteredItems.length === 0 && (
+              <div className="mt-16 text-center">
+                <p className="font-display text-2xl">No photos match this colour</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Try clearing the filter or browsing a deeper sub-collection.
+                </p>
+              </div>
+            )}
+
+            {visible < filteredItems.length && (
               <div className="mt-10 text-center">
                 <Button variant="outline" onClick={() => setVisible((v) => v + 60)}>
                   Show more photos

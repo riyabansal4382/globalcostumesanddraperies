@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CostumeCard } from "@/components/CostumeCard";
 import { FolderCard } from "@/components/FolderCard";
+import { FilterChip } from "@/components/FilterChip";
 import { buildFolderTree, costumesQuery } from "@/lib/folders";
 import { swatchStyle, type Costume } from "@/lib/costumes";
 import { cn } from "@/lib/utils";
@@ -37,30 +38,6 @@ export const Route = createFileRoute("/")({
 });
 
 
-function FilterChip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-all",
-        active
-          ? "border-transparent bg-primary text-primary-foreground shadow-stage"
-          : "border-border bg-card text-foreground hover:border-accent hover:bg-secondary",
-      )}
-    >
-      {children}
-    </button>
-  );
-}
 
 function Catalogue() {
   const { data, isLoading } = useQuery(costumesQuery);
