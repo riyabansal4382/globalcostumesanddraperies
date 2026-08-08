@@ -117,6 +117,20 @@ function Admin() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const runImport = useServerFn(importOneDriveCostumes);
+  const importFromOneDrive = useMutation({
+    mutationFn: () => runImport(),
+    onSuccess: (r) => {
+      toast.success(
+        `Imported ${r.imported} new photo${r.imported === 1 ? "" : "s"} from OneDrive` +
+          (r.skipped ? ` (${r.skipped} already in the catalogue)` : ""),
+      );
+      queryClient.invalidateQueries({ queryKey: ["costumes"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
   const autofill = () => {
     const source = form.source_path || form.image_url;
     if (!source) {
