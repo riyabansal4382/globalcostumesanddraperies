@@ -89,6 +89,8 @@ function Catalogue() {
   const [categories, setCategories] = useState<string[]>([]);
   const [sizes, setSizes] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [visible, setVisible] = useState(60);
+
 
   const costumes = useMemo(() => data ?? [], [data]);
 
