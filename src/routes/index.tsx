@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CostumeCard } from "@/components/CostumeCard";
+import { FolderCard } from "@/components/FolderCard";
+import { buildFolderTree, costumesQuery } from "@/lib/folders";
 import { swatchStyle, type Costume } from "@/lib/costumes";
 import { cn } from "@/lib/utils";
 
@@ -33,24 +35,6 @@ export const Route = createFileRoute("/")({
   }),
   component: Catalogue,
 });
-
-const PAGE = 1000;
-
-async function fetchCostumes(): Promise<Costume[]> {
-  const all: Costume[] = [];
-  // PostgREST caps a response at 1000 rows, so page through the catalogue.
-  for (let from = 0; ; from += PAGE) {
-    const { data, error } = await supabase
-      .from("costumes")
-      .select("*")
-      .order("name", { ascending: true })
-      .range(from, from + PAGE - 1);
-    if (error) throw error;
-    all.push(...((data ?? []) as Costume[]));
-    if (!data || data.length < PAGE) break;
-  }
-  return all;
-}
 
 
 function FilterChip({
@@ -79,10 +63,7 @@ function FilterChip({
 }
 
 function Catalogue() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["costumes"],
-    queryFn: fetchCostumes,
-  });
+  const { data, isLoading } = useQuery(costumesQuery);
 
   const [query, setQuery] = useState("");
   const [colors, setColors] = useState<string[]>([]);
@@ -139,6 +120,9 @@ function Catalogue() {
   }, [costumes, query, colors, categories, sizes]);
 
   useEffect(() => setVisible(60), [query, colors, categories, sizes]);
+
+  const folders = useMemo(() => buildFolderTree(costumes), [costumes]);
+  const isSearching = query.trim().length > 0 || colors.length > 0 || categories.length > 0 || sizes.length > 0;
 
 
 
@@ -223,7 +207,11 @@ function Catalogue() {
       <section className="mx-auto max-w-6xl px-5 py-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-xl">
-            {isLoading ? "Loading wardrobe…" : `${results.length} costumes`}
+            {isLoading
+              ? "Loading wardrobe…"
+              : isSearching
+                ? `${results.length} costumes`
+                : "Browse the wardrobe"}
           </h2>
           <div className="flex items-center gap-2">
             {activeCount > 0 && (
@@ -312,6 +300,24 @@ function Catalogue() {
               <Skeleton key={i} className="h-80 rounded-2xl" />
             ))}
           </div>
+        ) : !isSearching ? (
+          <>
+            <p className="mt-8 text-sm text-muted-foreground">
+              {folders.length} collections — pick one to see everything inside.
+            </p>
+            <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {folders.map((folder) => (
+                <FolderCard
+                  key={folder.slug}
+                  folder={folder}
+                  linkProps={{
+                    to: "/collection/$folder",
+                    params: { folder: folder.slug },
+                  }}
+                />
+              ))}
+            </div>
+          </>
         ) : results.length === 0 ? (
           <div className="mt-16 text-center">
             <p className="font-display text-2xl">Nothing matches that yet</p>
@@ -338,6 +344,7 @@ function Catalogue() {
             )}
           </>
         )}
+
 
       </section>
 
