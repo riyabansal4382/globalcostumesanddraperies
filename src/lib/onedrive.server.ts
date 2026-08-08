@@ -46,17 +46,28 @@ async function graphJson<T>(path: string): Promise<T> {
 type DriveItem = {
   id: string;
   name: string;
-  size?: number;
   folder?: { childCount: number };
   file?: { mimeType?: string };
 };
 
 type ChildrenResponse = { value: DriveItem[]; "@odata.nextLink"?: string };
 
-async function listChildren(itemPath: string): Promise<DriveItem[]> {
+type ShareRoot = { id: string; parentReference?: { driveId?: string } };
+
+/** The shared folder lives in the owner's drive, so resolve its drive id once. */
+export async function resolveShareRoot() {
+  const root = await graphJson<ShareRoot>(
+    `/shares/${encodeShareId(SHARE_URL)}/driveItem?$select=id,name,parentReference`,
+  );
+  const driveId = root.parentReference?.driveId;
+  if (!driveId) throw new Error("Could not resolve the OneDrive folder.");
+  return { driveId, itemId: root.id };
+}
+
+async function listChildren(driveId: string, itemId: string): Promise<DriveItem[]> {
   const out: DriveItem[] = [];
   let next: string | undefined =
-    `${itemPath}/children?$select=id,name,folder,file,size&$top=200`;
+    `/drives/${driveId}/items/${itemId}/children?$select=id,name,folder,file&$top=200`;
   while (next) {
     const page: ChildrenResponse = await graphJson<ChildrenResponse>(next);
     out.push(...page.value);
@@ -73,42 +84,52 @@ export type OneDrivePhoto = {
   category: string;
 };
 
-const IMAGE_RE = /\.(jpe?g|png|webp|gif|heic|avif)$/i;
+const IMAGE_RE = /\.(jpe?g|png|webp|gif|heic|heif|avif)$/i;
+/** Camera-generated names like 20230303_083130000_iOS.jpg carry no meaning. */
+const CAMERA_RE = /^(img|dsc|photo|\d{8})[\s_-]?\d*/i;
+
+function prettyName(fileName: string, folder: string, index: number) {
+  const base = fileName.replace(IMAGE_RE, "").replace(/[_]+/g, " ").trim();
+  if (!base || CAMERA_RE.test(base)) {
+    return folder ? `${folder} ${index}` : `Costume ${index}`;
+  }
+  return base.replace(/\b\w/g, (m) => m.toUpperCase());
+}
 
 /**
- * Walk the shared folder (root + subfolders, two levels deep) and return
+ * Walk the shared folder (root + up to two levels of subfolders) and return
  * every image file found, with its folder used as the category.
  */
-export async function listCostumePhotos(maxItems = 2000): Promise<OneDrivePhoto[]> {
-  const shareRoot = `/shares/${encodeShareId(SHARE_URL)}/driveItem`;
+export async function listCostumePhotos(maxItems = 3000): Promise<OneDrivePhoto[]> {
+  const { driveId, itemId } = await resolveShareRoot();
   const photos: OneDrivePhoto[] = [];
 
   const collect = (items: DriveItem[], folderName: string) => {
+    let index = 1;
     for (const item of items) {
       if (item.folder || !IMAGE_RE.test(item.name)) continue;
       if (photos.length >= maxItems) return;
       photos.push({
         id: item.id,
-        name: item.name.replace(IMAGE_RE, "").replace(/[_]+/g, " ").trim(),
+        name: prettyName(item.name, folderName, index++),
         path: folderName ? `${folderName}/${item.name}` : item.name,
-        category: folderName || "Other",
+        category: folderName ? (folderName.split(" / ")[0] as string) : "Other",
       });
     }
   };
 
-  const rootItems = await listChildren(shareRoot);
+  const rootItems = await listChildren(driveId, itemId);
   collect(rootItems, "");
 
   const folders = rootItems.filter((i) => i.folder && !i.name.startsWith("."));
   for (const folder of folders) {
     if (photos.length >= maxItems) break;
-    const children = await listChildren(`/me/drive/items/${folder.id}`);
+    const children = await listChildren(driveId, folder.id);
     collect(children, folder.name);
 
-    // one more level (e.g. Category/Subcategory/photo.jpg)
     for (const sub of children.filter((c) => c.folder && !c.name.startsWith("."))) {
       if (photos.length >= maxItems) break;
-      const subChildren = await listChildren(`/me/drive/items/${sub.id}`);
+      const subChildren = await listChildren(driveId, sub.id);
       collect(subChildren, `${folder.name} / ${sub.name}`);
     }
   }
@@ -116,7 +137,16 @@ export async function listCostumePhotos(maxItems = 2000): Promise<OneDrivePhoto[
   return photos;
 }
 
-/** Stream a OneDrive image back to the browser. */
+/**
+ * Stream a costume photo. Uses the large Graph thumbnail (always JPEG), so
+ * iPhone HEIC originals still render in the browser.
+ */
 export async function fetchImage(itemId: string) {
-  return graphFetch(`/me/drive/items/${encodeURIComponent(itemId)}/content`);
+  const { driveId } = await resolveShareRoot();
+  const base = `/drives/${driveId}/items/${encodeURIComponent(itemId)}`;
+  try {
+    return await graphFetch(`${base}/thumbnails/0/large/content`);
+  } catch {
+    return graphFetch(`${base}/content`);
+  }
 }
