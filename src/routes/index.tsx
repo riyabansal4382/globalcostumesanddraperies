@@ -320,12 +320,25 @@ function Catalogue() {
             </p>
           </div>
         ) : (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {results.map((costume) => (
-              <CostumeCard key={costume.id} costume={costume} />
-            ))}
-          </div>
+          <>
+            <p className="mt-8 text-sm text-muted-foreground">
+              Showing {Math.min(visible, results.length)} of {results.length} costumes
+            </p>
+            <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {results.slice(0, visible).map((costume) => (
+                <CostumeCard key={costume.id} costume={costume} />
+              ))}
+            </div>
+            {visible < results.length && (
+              <div className="mt-10 text-center">
+                <Button variant="outline" onClick={() => setVisible((v) => v + 60)}>
+                  Show more costumes
+                </Button>
+              </div>
+            )}
+          </>
         )}
+
       </section>
 
       <footer className="border-t border-border py-10 text-center text-sm text-muted-foreground">
