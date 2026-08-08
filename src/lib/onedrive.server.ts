@@ -1,7 +1,7 @@
 // Server-only helpers for reading the business OneDrive folder through the
 // Lovable connector gateway. Never import this from client code.
 
-const GATEWAY_BASE = "https://connector-gateway.lovable.dev/microsoft_onedrive/v1.0";
+const GATEWAY_BASE = "https://connector-gateway.lovable.dev/microsoft_onedrive";
 
 /** The shared costume-photo folder, encoded as a Graph share id. */
 export const SHARE_URL =
