@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Trash2, Wand2, LogOut } from "lucide-react";
+import { Trash2, Wand2, LogOut, CloudDownload } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { importOneDriveCostumes } from "@/lib/onedrive.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +22,7 @@ import {
   type Costume,
 } from "@/lib/costumes";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -114,6 +117,20 @@ function Admin() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const runImport = useServerFn(importOneDriveCostumes);
+  const importFromOneDrive = useMutation({
+    mutationFn: () => runImport(),
+    onSuccess: (r) => {
+      toast.success(
+        `Imported ${r.imported} new photo${r.imported === 1 ? "" : "s"} from OneDrive` +
+          (r.skipped ? ` (${r.skipped} already in the catalogue)` : ""),
+      );
+      queryClient.invalidateQueries({ queryKey: ["costumes"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
   const autofill = () => {
     const source = form.source_path || form.image_url;
     if (!source) {
@@ -154,9 +171,19 @@ function Admin() {
             <p className="text-sm text-primary-foreground/70">{count} costumes in the catalogue</p>
           </div>
           <div className="flex gap-2">
+            <Button
+              size="sm"
+              className="gap-2"
+              disabled={importFromOneDrive.isPending}
+              onClick={() => importFromOneDrive.mutate()}
+            >
+              <CloudDownload className="size-4" />
+              {importFromOneDrive.isPending ? "Importing…" : "Import from OneDrive"}
+            </Button>
             <Button asChild variant="secondary" size="sm">
               <Link to="/">View site</Link>
             </Button>
+
             <Button variant="outline" size="sm" onClick={signOut} className="gap-2">
               <LogOut className="size-4" /> Sign out
             </Button>
