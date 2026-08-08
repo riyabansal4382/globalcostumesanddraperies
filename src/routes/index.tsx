@@ -34,14 +34,24 @@ export const Route = createFileRoute("/")({
   component: Catalogue,
 });
 
+const PAGE = 1000;
+
 async function fetchCostumes(): Promise<Costume[]> {
-  const { data, error } = await supabase
-    .from("costumes")
-    .select("*")
-    .order("name", { ascending: true });
-  if (error) throw error;
-  return (data ?? []) as Costume[];
+  const all: Costume[] = [];
+  // PostgREST caps a response at 1000 rows, so page through the catalogue.
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from("costumes")
+      .select("*")
+      .order("name", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) throw error;
+    all.push(...((data ?? []) as Costume[]));
+    if (!data || data.length < PAGE) break;
+  }
+  return all;
 }
+
 
 function FilterChip({
   active,
