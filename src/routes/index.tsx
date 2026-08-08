@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Search, X, SlidersHorizontal, Sparkles } from "lucide-react";
@@ -34,14 +34,24 @@ export const Route = createFileRoute("/")({
   component: Catalogue,
 });
 
+const PAGE = 1000;
+
 async function fetchCostumes(): Promise<Costume[]> {
-  const { data, error } = await supabase
-    .from("costumes")
-    .select("*")
-    .order("name", { ascending: true });
-  if (error) throw error;
-  return (data ?? []) as Costume[];
+  const all: Costume[] = [];
+  // PostgREST caps a response at 1000 rows, so page through the catalogue.
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from("costumes")
+      .select("*")
+      .order("name", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) throw error;
+    all.push(...((data ?? []) as Costume[]));
+    if (!data || data.length < PAGE) break;
+  }
+  return all;
 }
+
 
 function FilterChip({
   active,
@@ -79,6 +89,8 @@ function Catalogue() {
   const [categories, setCategories] = useState<string[]>([]);
   const [sizes, setSizes] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [visible, setVisible] = useState(60);
+
 
   const costumes = useMemo(() => data ?? [], [data]);
 
@@ -125,6 +137,10 @@ function Catalogue() {
       return true;
     });
   }, [costumes, query, colors, categories, sizes]);
+
+  useEffect(() => setVisible(60), [query, colors, categories, sizes]);
+
+
 
   const toggle = (
     value: string,
@@ -304,12 +320,25 @@ function Catalogue() {
             </p>
           </div>
         ) : (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {results.map((costume) => (
-              <CostumeCard key={costume.id} costume={costume} />
-            ))}
-          </div>
+          <>
+            <p className="mt-8 text-sm text-muted-foreground">
+              Showing {Math.min(visible, results.length)} of {results.length} costumes
+            </p>
+            <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {results.slice(0, visible).map((costume) => (
+                <CostumeCard key={costume.id} costume={costume} />
+              ))}
+            </div>
+            {visible < results.length && (
+              <div className="mt-10 text-center">
+                <Button variant="outline" onClick={() => setVisible((v) => v + 60)}>
+                  Show more costumes
+                </Button>
+              </div>
+            )}
+          </>
         )}
+
       </section>
 
       <footer className="border-t border-border py-10 text-center text-sm text-muted-foreground">
