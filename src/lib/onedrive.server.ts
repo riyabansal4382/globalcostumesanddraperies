@@ -27,8 +27,9 @@ function headers() {
 export async function graphFetch(path: string, init?: RequestInit) {
   // Graph paging links are absolute; route them back through the gateway.
   const url = path.startsWith("http")
-    ? path.replace("https://graph.microsoft.com", GATEWAY_BASE)
-    : `${GATEWAY_BASE}/v1.0${path}`;
+    ? path.replace("https://graph.microsoft.com/v1.0", GATEWAY_BASE)
+    : `${GATEWAY_BASE}${path}`;
+
 
   const res = await fetch(url, {
     ...init,
