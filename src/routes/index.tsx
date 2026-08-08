@@ -138,6 +138,10 @@ function Catalogue() {
     });
   }, [costumes, query, colors, categories, sizes]);
 
+  useEffect(() => setVisible(60), [query, colors, categories, sizes]);
+
+
+
   const toggle = (
     value: string,
     list: string[],
