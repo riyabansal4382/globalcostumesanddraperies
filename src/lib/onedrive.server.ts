@@ -202,3 +202,24 @@ export async function fetchImage(itemId: string) {
     return graphFetch(`${base}/content`);
   }
 }
+
+/**
+ * Stream a costume photo addressed by its folder/file path inside the shared
+ * folder. Item ids change when the folder is re-shared, so path addressing is
+ * the stable way to reach a photo.
+ */
+export async function fetchImageByPath(sourcePath: string) {
+  const { driveId, itemId } = await resolveShareRoot();
+  // Stored paths use " / " between nested folders.
+  const clean = sourcePath
+    .split(/\s*\/\s*/)
+    .filter(Boolean)
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+  const base = `/drives/${driveId}/items/${itemId}:/${clean}:`;
+  try {
+    return await graphFetch(`${base}/thumbnails/0/large/content`);
+  } catch {
+    return graphFetch(`${base}/content`);
+  }
+}
