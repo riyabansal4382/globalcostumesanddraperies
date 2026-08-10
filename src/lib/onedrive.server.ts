@@ -3,8 +3,8 @@
 
 const GATEWAY_BASE = "https://connector-gateway.lovable.dev/microsoft_onedrive";
 
-/** Folder in the connected OneDrive account holding the costume photos. */
-export const ROOT_FOLDER = "Tagged_Photos";
+/** Folder holding the costume photos (lives in the shared costume drive). */
+export const ROOT_FOLDER = "Original_photos";
 
 function headers() {
   const lovableKey = process.env["LOVABLE_API_KEY"];
@@ -54,17 +54,45 @@ type FolderItem = { id: string; parentReference?: { driveId?: string } };
 
 let cachedRoot: { driveId: string; itemId: string } | null = null;
 
-/** Resolve the photo folder in the connected account's own drive. */
+type SharedItem = {
+  name: string;
+  remoteItem?: { id: string; parentReference?: { driveId?: string } };
+};
+
+/** Resolve the photo folder, in the account's own drive or a shared drive. */
 export async function resolveShareRoot() {
   if (cachedRoot) return cachedRoot;
 
-  const item = await graphJson<FolderItem>(
-    `/me/drive/root:/${encodeURIComponent(ROOT_FOLDER)}?$select=id,name,parentReference`,
-  );
-  const driveId = item.parentReference?.driveId;
-  if (!driveId) throw new Error("Could not resolve the OneDrive folder.");
-  cachedRoot = { driveId, itemId: item.id };
-  return cachedRoot;
+  try {
+    const item = await graphJson<FolderItem>(
+      `/me/drive/root:/${encodeURIComponent(ROOT_FOLDER)}?$select=id,name,parentReference`,
+    );
+    const driveId = item.parentReference?.driveId;
+    if (driveId) {
+      cachedRoot = { driveId, itemId: item.id };
+      return cachedRoot;
+    }
+  } catch {
+    // fall through to the shared-with-me drives below
+  }
+
+  const shared = await graphJson<{ value: SharedItem[] }>("/me/drive/sharedWithMe");
+  for (const entry of shared.value) {
+    const remote = entry.remoteItem;
+    const driveId = remote?.parentReference?.driveId;
+    if (!remote || !driveId) continue;
+    if (entry.name === ROOT_FOLDER) {
+      cachedRoot = { driveId, itemId: remote.id };
+      return cachedRoot;
+    }
+    const children = await listChildren(driveId, remote.id);
+    const match = children.find((c) => c.folder && c.name === ROOT_FOLDER);
+    if (match) {
+      cachedRoot = { driveId, itemId: match.id };
+      return cachedRoot;
+    }
+  }
+  throw new Error("Could not resolve the OneDrive folder.");
 }
 
 async function listChildren(driveId: string, itemId: string): Promise<DriveItem[]> {
@@ -124,18 +152,25 @@ export async function listCostumePhotos(maxItems = 5000): Promise<OneDrivePhoto[
   const { driveId, itemId } = await resolveShareRoot();
   const photos: OneDrivePhoto[] = [];
 
+  const KNOWN_COLORS = new Set(
+    [
+      "black","blue","brown","green","grey","gray","multicolor","multicolour",
+      "orange","pink","purple","red","white","yellow","gold","silver","beige","cream",
+    ],
+  );
+
   const collect = (items: DriveItem[], folderName: string) => {
     let index = 1;
     for (const item of items) {
       if (item.folder || !IMAGE_RE.test(item.name)) continue;
       if (photos.length >= maxItems) return;
       const top = folderName ? (folderName.split(" / ")[0] as string) : "Other";
-      const color = normalizeColor(top);
+      const color = KNOWN_COLORS.has(top.toLowerCase()) ? normalizeColor(top) : "";
       photos.push({
         id: item.id,
-        name: prettyName(item.name, color || top, index++),
+        name: prettyName(item.name, top, index++),
         path: folderName ? `${folderName}/${item.name}` : item.name,
-        category: color || top,
+        category: top,
         colors: color ? [color] : [],
       });
     }
