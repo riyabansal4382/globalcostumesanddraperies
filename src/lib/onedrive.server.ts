@@ -152,18 +152,25 @@ export async function listCostumePhotos(maxItems = 5000): Promise<OneDrivePhoto[
   const { driveId, itemId } = await resolveShareRoot();
   const photos: OneDrivePhoto[] = [];
 
+  const KNOWN_COLORS = new Set(
+    [
+      "black","blue","brown","green","grey","gray","multicolor","multicolour",
+      "orange","pink","purple","red","white","yellow","gold","silver","beige","cream",
+    ],
+  );
+
   const collect = (items: DriveItem[], folderName: string) => {
     let index = 1;
     for (const item of items) {
       if (item.folder || !IMAGE_RE.test(item.name)) continue;
       if (photos.length >= maxItems) return;
       const top = folderName ? (folderName.split(" / ")[0] as string) : "Other";
-      const color = normalizeColor(top);
+      const color = KNOWN_COLORS.has(top.toLowerCase()) ? normalizeColor(top) : "";
       photos.push({
         id: item.id,
-        name: prettyName(item.name, color || top, index++),
+        name: prettyName(item.name, top, index++),
         path: folderName ? `${folderName}/${item.name}` : item.name,
-        category: color || top,
+        category: top,
         colors: color ? [color] : [],
       });
     }
