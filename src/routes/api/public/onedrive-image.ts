@@ -2,18 +2,25 @@ import { createFileRoute } from "@tanstack/react-router";
 
 // Public image proxy: costume photos live in the business OneDrive and their
 // direct download links expire, so we stream them through this stable URL.
-// Read-only, single item by id, no user data exposed.
+// Read-only, single item by path (or legacy item id), no user data exposed.
 export const Route = createFileRoute("/api/public/onedrive-image")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const id = new URL(request.url).searchParams.get("id");
-        if (!id || !/^[A-Za-z0-9!._-]{5,200}$/.test(id)) {
+        const params = new URL(request.url).searchParams;
+        const path = params.get("path");
+        const id = params.get("id");
+
+        if (path && (path.length > 400 || path.includes(".."))) {
+          return new Response("Invalid path", { status: 400 });
+        }
+        if (!path && (!id || !/^[A-Za-z0-9!._-]{5,200}$/.test(id))) {
           return new Response("Invalid id", { status: 400 });
         }
+
         try {
-          const { fetchImage } = await import("@/lib/onedrive.server");
-          const upstream = await fetchImage(id);
+          const { fetchImage, fetchImageByPath } = await import("@/lib/onedrive.server");
+          const upstream = path ? await fetchImageByPath(path) : await fetchImage(id!);
           return new Response(upstream.body, {
             status: 200,
             headers: {
