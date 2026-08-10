@@ -3,14 +3,8 @@
 
 const GATEWAY_BASE = "https://connector-gateway.lovable.dev/microsoft_onedrive";
 
-/** The shared costume-photo folder, encoded as a Graph share id. */
-export const SHARE_URL =
-  "https://1drv.ms/f/c/c6d9552d27b012a2/IgCiErAnLVXZIIDGUQEAAAAAAcoZcOa4OzDHph9qaXyit68";
-
-export function encodeShareId(url: string) {
-  const b64 = Buffer.from(url, "utf8").toString("base64");
-  return `u!${b64.replace(/=+$/, "").replace(/\//g, "_").replace(/\+/g, "-")}`;
-}
+/** Folder in the connected OneDrive account holding the costume photos. */
+export const ROOT_FOLDER = "Tagged_Photos";
 
 function headers() {
   const lovableKey = process.env["LOVABLE_API_KEY"];
@@ -29,7 +23,6 @@ export async function graphFetch(path: string, init?: RequestInit) {
   const url = path.startsWith("http")
     ? path.replace("https://graph.microsoft.com/v1.0", GATEWAY_BASE)
     : `${GATEWAY_BASE}${path}`;
-
 
   const res = await fetch(url, {
     ...init,
@@ -57,64 +50,22 @@ type DriveItem = {
 
 type ChildrenResponse = { value: DriveItem[]; "@odata.nextLink"?: string };
 
-type ShareRoot = { id: string; parentReference?: { driveId?: string } };
-
-type SharedWithMe = {
-  value: Array<{
-    name: string;
-    remoteItem?: { id: string; parentReference?: { driveId?: string } };
-  }>;
-};
-
-/** Name of the shared folder as it appears in the owner's drive. */
-const SHARED_FOLDER_NAME = "Original_photos";
+type FolderItem = { id: string; parentReference?: { driveId?: string } };
 
 let cachedRoot: { driveId: string; itemId: string } | null = null;
 
-/**
- * The shared folder lives in another OneDrive account, so resolve its drive id
- * once. The share link works when it is still valid; otherwise we fall back to
- * the "Shared with me" listing, which survives re-sharing/link changes.
- */
+/** Resolve the photo folder in the connected account's own drive. */
 export async function resolveShareRoot() {
   if (cachedRoot) return cachedRoot;
 
-  try {
-    const root = await graphJson<ShareRoot>(
-      `/shares/${encodeShareId(SHARE_URL)}/driveItem?$select=id,name,parentReference`,
-    );
-    const driveId = root.parentReference?.driveId;
-    if (driveId) {
-      cachedRoot = { driveId, itemId: root.id };
-      return cachedRoot;
-    }
-  } catch {
-    // fall through to the shared-with-me lookup below
-  }
-
-  const shared = await graphJson<SharedWithMe>(`/me/drive/sharedWithMe`);
-  for (const entry of shared.value) {
-    const remote = entry.remoteItem;
-    const driveId = remote?.parentReference?.driveId;
-    if (!remote || !driveId) continue;
-    if (entry.name === SHARED_FOLDER_NAME) {
-      cachedRoot = { driveId, itemId: remote.id };
-      return cachedRoot;
-    }
-    // The share may point at the parent folder containing Original_photos.
-    const children = await graphJson<ChildrenResponse>(
-      `/drives/${driveId}/items/${remote.id}/children?$select=id,name,folder&$top=200`,
-    );
-    const match = children.value.find((c) => c.name === SHARED_FOLDER_NAME && c.folder);
-    if (match) {
-      cachedRoot = { driveId, itemId: match.id };
-      return cachedRoot;
-    }
-  }
-
-  throw new Error("Could not resolve the OneDrive folder.");
+  const item = await graphJson<FolderItem>(
+    `/me/drive/root:/${encodeURIComponent(ROOT_FOLDER)}?$select=id,name,parentReference`,
+  );
+  const driveId = item.parentReference?.driveId;
+  if (!driveId) throw new Error("Could not resolve the OneDrive folder.");
+  cachedRoot = { driveId, itemId: item.id };
+  return cachedRoot;
 }
-
 
 async function listChildren(driveId: string, itemId: string): Promise<DriveItem[]> {
   const out: DriveItem[] = [];
@@ -131,17 +82,34 @@ async function listChildren(driveId: string, itemId: string): Promise<DriveItem[
 export type OneDrivePhoto = {
   id: string;
   name: string;
-  /** Folder/file path used for auto-tagging, e.g. "Angarakha/Red kurta.jpg". */
+  /** Folder/file path used for auto-tagging, e.g. "Red/[Red]_IMG_1234.jpg". */
   path: string;
   category: string;
+  colors: string[];
 };
 
 const IMAGE_RE = /\.(jpe?g|png|webp|gif|heic|heif|avif)$/i;
 /** Camera-generated names like 20230303_083130000_iOS.jpg carry no meaning. */
 const CAMERA_RE = /^(img|dsc|photo|\d{8})[\s_-]?\d*/i;
 
+/** Folder names in OneDrive use US spellings; the catalogue uses UK ones. */
+const COLOR_ALIASES: Record<string, string> = {
+  Gray: "Grey",
+  Multicolor: "Multicolour",
+};
+
+export function normalizeColor(folder: string) {
+  const name = folder.trim();
+  const mapped = COLOR_ALIASES[name] ?? name;
+  return mapped.toLowerCase() === "untagged" ? "" : mapped;
+}
+
 function prettyName(fileName: string, folder: string, index: number) {
-  const base = fileName.replace(IMAGE_RE, "").replace(/[_]+/g, " ").trim();
+  const base = fileName
+    .replace(IMAGE_RE, "")
+    .replace(/^\[[^\]]*\]_?/, "") // strip the "[Colour]_" tag prefix
+    .replace(/[_]+/g, " ")
+    .trim();
   if (!base || CAMERA_RE.test(base)) {
     return folder ? `${folder} ${index}` : `Costume ${index}`;
   }
@@ -149,10 +117,10 @@ function prettyName(fileName: string, folder: string, index: number) {
 }
 
 /**
- * Walk the shared folder (root + up to two levels of subfolders) and return
- * every image file found, with its folder used as the category.
+ * Walk the photo folder (root + up to two levels of subfolders) and return
+ * every image file found, with its folder used as the category/colour.
  */
-export async function listCostumePhotos(maxItems = 3000): Promise<OneDrivePhoto[]> {
+export async function listCostumePhotos(maxItems = 5000): Promise<OneDrivePhoto[]> {
   const { driveId, itemId } = await resolveShareRoot();
   const photos: OneDrivePhoto[] = [];
 
@@ -161,11 +129,14 @@ export async function listCostumePhotos(maxItems = 3000): Promise<OneDrivePhoto[
     for (const item of items) {
       if (item.folder || !IMAGE_RE.test(item.name)) continue;
       if (photos.length >= maxItems) return;
+      const top = folderName ? (folderName.split(" / ")[0] as string) : "Other";
+      const color = normalizeColor(top);
       photos.push({
         id: item.id,
-        name: prettyName(item.name, folderName, index++),
+        name: prettyName(item.name, color || top, index++),
         path: folderName ? `${folderName}/${item.name}` : item.name,
-        category: folderName ? (folderName.split(" / ")[0] as string) : "Other",
+        category: color || top,
+        colors: color ? [color] : [],
       });
     }
   };
@@ -204,9 +175,9 @@ export async function fetchImage(itemId: string) {
 }
 
 /**
- * Stream a costume photo addressed by its folder/file path inside the shared
- * folder. Item ids change when the folder is re-shared, so path addressing is
- * the stable way to reach a photo.
+ * Stream a costume photo addressed by its folder/file path inside the photo
+ * folder. Item ids change over time, so path addressing is the stable way to
+ * reach a photo.
  */
 export async function fetchImageByPath(sourcePath: string) {
   const { driveId, itemId } = await resolveShareRoot();
