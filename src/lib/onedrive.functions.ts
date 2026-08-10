@@ -30,7 +30,7 @@ export const importOneDriveCostumes = createServerFn({ method: "POST" })
         return {
           name: guess.name || p.name,
           description: "",
-          image_url: `/api/public/onedrive-image?id=${encodeURIComponent(p.id)}`,
+          image_url: `/api/public/onedrive-image?path=${encodeURIComponent(p.path)}`,
           source_path: p.path,
           category: p.category,
           colors: guess.colors,
