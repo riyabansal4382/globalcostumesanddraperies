@@ -59,15 +59,62 @@ type ChildrenResponse = { value: DriveItem[]; "@odata.nextLink"?: string };
 
 type ShareRoot = { id: string; parentReference?: { driveId?: string } };
 
-/** The shared folder lives in the owner's drive, so resolve its drive id once. */
+type SharedWithMe = {
+  value: Array<{
+    name: string;
+    remoteItem?: { id: string; parentReference?: { driveId?: string } };
+  }>;
+};
+
+/** Name of the shared folder as it appears in the owner's drive. */
+const SHARED_FOLDER_NAME = "Original_photos";
+
+let cachedRoot: { driveId: string; itemId: string } | null = null;
+
+/**
+ * The shared folder lives in another OneDrive account, so resolve its drive id
+ * once. The share link works when it is still valid; otherwise we fall back to
+ * the "Shared with me" listing, which survives re-sharing/link changes.
+ */
 export async function resolveShareRoot() {
-  const root = await graphJson<ShareRoot>(
-    `/shares/${encodeShareId(SHARE_URL)}/driveItem?$select=id,name,parentReference`,
-  );
-  const driveId = root.parentReference?.driveId;
-  if (!driveId) throw new Error("Could not resolve the OneDrive folder.");
-  return { driveId, itemId: root.id };
+  if (cachedRoot) return cachedRoot;
+
+  try {
+    const root = await graphJson<ShareRoot>(
+      `/shares/${encodeShareId(SHARE_URL)}/driveItem?$select=id,name,parentReference`,
+    );
+    const driveId = root.parentReference?.driveId;
+    if (driveId) {
+      cachedRoot = { driveId, itemId: root.id };
+      return cachedRoot;
+    }
+  } catch {
+    // fall through to the shared-with-me lookup below
+  }
+
+  const shared = await graphJson<SharedWithMe>(`/me/drive/sharedWithMe`);
+  for (const entry of shared.value) {
+    const remote = entry.remoteItem;
+    const driveId = remote?.parentReference?.driveId;
+    if (!remote || !driveId) continue;
+    if (entry.name === SHARED_FOLDER_NAME) {
+      cachedRoot = { driveId, itemId: remote.id };
+      return cachedRoot;
+    }
+    // The share may point at the parent folder containing Original_photos.
+    const children = await graphJson<ChildrenResponse>(
+      `/drives/${driveId}/items/${remote.id}/children?$select=id,name,folder&$top=200`,
+    );
+    const match = children.value.find((c) => c.name === SHARED_FOLDER_NAME && c.folder);
+    if (match) {
+      cachedRoot = { driveId, itemId: match.id };
+      return cachedRoot;
+    }
+  }
+
+  throw new Error("Could not resolve the OneDrive folder.");
 }
+
 
 async function listChildren(driveId: string, itemId: string): Promise<DriveItem[]> {
   const out: DriveItem[] = [];
