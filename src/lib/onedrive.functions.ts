@@ -28,12 +28,12 @@ export const importOneDriveCostumes = createServerFn({ method: "POST" })
       .map((p) => {
         const guess = parseFromFilename(p.path);
         return {
-          name: guess.name || p.name,
+          name: p.name,
           description: "",
           image_url: `/api/public/onedrive-image?path=${encodeURIComponent(p.path)}`,
           source_path: p.path,
           category: p.category,
-          colors: guess.colors,
+          colors: p.colors.length ? p.colors : guess.colors,
           sizes: guess.sizes,
           tags: [p.category.toLowerCase()],
           is_available: true,
