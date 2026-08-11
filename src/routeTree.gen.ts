@@ -15,8 +15,6 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CollectionSplatRouteImport } from './routes/collection.$'
 import { Route as ApiPublicOnedriveImageRouteImport } from './routes/api/public/onedrive-image'
-import { Route as CollectionFolderIndexRouteImport } from './routes/collection.$folder.index'
-import { Route as CollectionFolderSubRouteImport } from './routes/collection.$folder.$sub'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -47,16 +45,6 @@ const ApiPublicOnedriveImageRoute = ApiPublicOnedriveImageRouteImport.update({
   path: '/api/public/onedrive-image',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CollectionFolderIndexRoute = CollectionFolderIndexRouteImport.update({
-  id: '/collection/$folder/',
-  path: '/collection/$folder/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CollectionFolderSubRoute = CollectionFolderSubRouteImport.update({
-  id: '/collection/$folder/$sub',
-  path: '/collection/$folder/$sub',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -64,8 +52,6 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/collection/$': typeof CollectionSplatRoute
   '/api/public/onedrive-image': typeof ApiPublicOnedriveImageRoute
-  '/collection/$folder/$sub': typeof CollectionFolderSubRoute
-  '/collection/$folder/': typeof CollectionFolderIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -73,8 +59,6 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/collection/$': typeof CollectionSplatRoute
   '/api/public/onedrive-image': typeof ApiPublicOnedriveImageRoute
-  '/collection/$folder/$sub': typeof CollectionFolderSubRoute
-  '/collection/$folder': typeof CollectionFolderIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -84,28 +68,13 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/collection/$': typeof CollectionSplatRoute
   '/api/public/onedrive-image': typeof ApiPublicOnedriveImageRoute
-  '/collection/$folder/$sub': typeof CollectionFolderSubRoute
-  '/collection/$folder/': typeof CollectionFolderIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/auth'
-    | '/admin'
-    | '/collection/$'
-    | '/api/public/onedrive-image'
-    | '/collection/$folder/$sub'
-    | '/collection/$folder/'
+    '/' | '/auth' | '/admin' | '/collection/$' | '/api/public/onedrive-image'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/auth'
-    | '/admin'
-    | '/collection/$'
-    | '/api/public/onedrive-image'
-    | '/collection/$folder/$sub'
-    | '/collection/$folder'
+  to: '/' | '/auth' | '/admin' | '/collection/$' | '/api/public/onedrive-image'
   id:
     | '__root__'
     | '/'
@@ -114,8 +83,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/collection/$'
     | '/api/public/onedrive-image'
-    | '/collection/$folder/$sub'
-    | '/collection/$folder/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -124,8 +91,6 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CollectionSplatRoute: typeof CollectionSplatRoute
   ApiPublicOnedriveImageRoute: typeof ApiPublicOnedriveImageRoute
-  CollectionFolderSubRoute: typeof CollectionFolderSubRoute
-  CollectionFolderIndexRoute: typeof CollectionFolderIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,20 +137,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicOnedriveImageRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/collection/$folder/': {
-      id: '/collection/$folder/'
-      path: '/collection/$folder'
-      fullPath: '/collection/$folder/'
-      preLoaderRoute: typeof CollectionFolderIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/collection/$folder/$sub': {
-      id: '/collection/$folder/$sub'
-      path: '/collection/$folder/$sub'
-      fullPath: '/collection/$folder/$sub'
-      preLoaderRoute: typeof CollectionFolderSubRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -206,8 +157,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CollectionSplatRoute: CollectionSplatRoute,
   ApiPublicOnedriveImageRoute: ApiPublicOnedriveImageRoute,
-  CollectionFolderSubRoute: CollectionFolderSubRoute,
-  CollectionFolderIndexRoute: CollectionFolderIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

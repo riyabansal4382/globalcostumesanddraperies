@@ -288,9 +288,10 @@ function Catalogue() {
                   key={folder.slug}
                   folder={folder}
                   linkProps={{
-                    to: "/collection/$folder",
-                    params: { folder: folder.slug },
+                    to: "/collection/$",
+                    params: { _splat: folder.slug },
                   }}
+
                 />
               ))}
             </div>
