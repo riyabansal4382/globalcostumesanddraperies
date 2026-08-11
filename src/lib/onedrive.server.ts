@@ -18,23 +18,46 @@ function headers() {
   };
 }
 
+const RETRY_STATUS = new Set([429, 500, 502, 503, 504]);
+
 export async function graphFetch(path: string, init?: RequestInit) {
   // Graph paging links are absolute; route them back through the gateway.
   const url = path.startsWith("http")
     ? path.replace("https://graph.microsoft.com/v1.0", GATEWAY_BASE)
     : `${GATEWAY_BASE}${path}`;
 
-  const res = await fetch(url, {
-    ...init,
-    headers: { ...headers(), ...(init?.headers ?? {}) },
-    redirect: "follow",
-  });
-  if (!res.ok) {
+  // Loading a grid of photos fires many parallel requests, so Graph/gateway
+  // throttling (429/5xx) is common and transient — retry with backoff.
+  let lastError = "";
+  for (let attempt = 0; attempt < 3; attempt++) {
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        ...init,
+        headers: { ...headers(), ...(init?.headers ?? {}) },
+        redirect: "follow",
+      });
+    } catch (e) {
+      lastError = String(e);
+      await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
+      continue;
+    }
+    if (res.ok) return res;
+
     const body = await res.text();
-    console.error(`[OneDrive] ${res.status} ${url}: ${body}`);
-    throw new Error(`OneDrive request failed [${res.status}]: ${body}`);
+    lastError = `[${res.status}] ${body}`;
+    if (!RETRY_STATUS.has(res.status) || attempt === 2) {
+      console.error(`[OneDrive] ${res.status} ${url}: ${body}`);
+      throw new Error(`OneDrive request failed ${lastError}`);
+    }
+    const retryAfter = Number(res.headers.get("retry-after"));
+    const waitMs = Number.isFinite(retryAfter) && retryAfter > 0
+      ? Math.min(retryAfter * 1000, 4000)
+      : 400 * (attempt + 1);
+    await new Promise((r) => setTimeout(r, waitMs));
   }
-  return res;
+  console.error(`[OneDrive] failed ${url}: ${lastError}`);
+  throw new Error(`OneDrive request failed ${lastError}`);
 }
 
 async function graphJson<T>(path: string): Promise<T> {
