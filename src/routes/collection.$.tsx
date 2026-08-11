@@ -176,7 +176,7 @@ function CollectionPage() {
               <>
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <h2 className="text-xl">
-                    Photos
+                    {colors.length > 0 ? "Matching photos" : "Photos"}
                     {colors.length > 0 && ` — ${filteredItems.length} match`}
                   </h2>
                   {colors.length > 0 && (
@@ -215,7 +215,7 @@ function CollectionPage() {
               </div>
             )}
 
-            {filteredItems.length === 0 && (
+            {filteredItems.length === 0 && (colors.length > 0 || node.children.length === 0) && (
               <div className="mt-16 text-center">
                 <p className="font-display text-2xl">
                   {colors.length ? "No photos match this colour" : "No photos here yet"}
