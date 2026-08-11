@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as CollectionSplatRouteImport } from './routes/collection.$'
 import { Route as ApiPublicOnedriveImageRouteImport } from './routes/api/public/onedrive-image'
 import { Route as CollectionFolderIndexRouteImport } from './routes/collection.$folder.index'
 import { Route as CollectionFolderSubRouteImport } from './routes/collection.$folder.$sub'
@@ -36,6 +37,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const CollectionSplatRoute = CollectionSplatRouteImport.update({
+  id: '/collection/$',
+  path: '/collection/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicOnedriveImageRoute = ApiPublicOnedriveImageRouteImport.update({
   id: '/api/public/onedrive-image',
   path: '/api/public/onedrive-image',
@@ -56,6 +62,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/collection/$': typeof CollectionSplatRoute
   '/api/public/onedrive-image': typeof ApiPublicOnedriveImageRoute
   '/collection/$folder/$sub': typeof CollectionFolderSubRoute
   '/collection/$folder/': typeof CollectionFolderIndexRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/collection/$': typeof CollectionSplatRoute
   '/api/public/onedrive-image': typeof ApiPublicOnedriveImageRoute
   '/collection/$folder/$sub': typeof CollectionFolderSubRoute
   '/collection/$folder': typeof CollectionFolderIndexRoute
@@ -74,6 +82,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/collection/$': typeof CollectionSplatRoute
   '/api/public/onedrive-image': typeof ApiPublicOnedriveImageRoute
   '/collection/$folder/$sub': typeof CollectionFolderSubRoute
   '/collection/$folder/': typeof CollectionFolderIndexRoute
@@ -84,6 +93,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/collection/$'
     | '/api/public/onedrive-image'
     | '/collection/$folder/$sub'
     | '/collection/$folder/'
@@ -92,6 +102,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/collection/$'
     | '/api/public/onedrive-image'
     | '/collection/$folder/$sub'
     | '/collection/$folder'
@@ -101,6 +112,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/admin'
+    | '/collection/$'
     | '/api/public/onedrive-image'
     | '/collection/$folder/$sub'
     | '/collection/$folder/'
@@ -110,6 +122,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CollectionSplatRoute: typeof CollectionSplatRoute
   ApiPublicOnedriveImageRoute: typeof ApiPublicOnedriveImageRoute
   CollectionFolderSubRoute: typeof CollectionFolderSubRoute
   CollectionFolderIndexRoute: typeof CollectionFolderIndexRoute
@@ -144,6 +157,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/collection/$': {
+      id: '/collection/$'
+      path: '/collection/$'
+      fullPath: '/collection/$'
+      preLoaderRoute: typeof CollectionSplatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/onedrive-image': {
       id: '/api/public/onedrive-image'
@@ -184,6 +204,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  CollectionSplatRoute: CollectionSplatRoute,
   ApiPublicOnedriveImageRoute: ApiPublicOnedriveImageRoute,
   CollectionFolderSubRoute: CollectionFolderSubRoute,
   CollectionFolderIndexRoute: CollectionFolderIndexRoute,

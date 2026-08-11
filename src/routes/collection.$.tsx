@@ -18,7 +18,7 @@ import { swatchStyle, type Costume } from "@/lib/costumes";
 
 export const Route = createFileRoute("/collection/$")({
   head: ({ params }) => {
-    const label = (params._splat ?? "")
+    const label = ((params as { _splat?: string })._splat ?? "")
       .split("/")
       .filter(Boolean)
       .at(-1)
@@ -45,10 +45,11 @@ function allItems(node: FolderNode): Costume[] {
 }
 
 function CollectionPage() {
-  const params = Route.useParams();
-  const segments = useMemo(
-    () => (params._splat ?? "").split("/").filter(Boolean),
-    [params._splat],
+  const params = Route.useParams() as { _splat?: string };
+  const splat = params._splat ?? "";
+  const segments = useMemo<string[]>(
+    () => splat.split("/").filter(Boolean),
+    [splat],
   );
   const { data, isLoading } = useQuery(costumesQuery);
   const [visible, setVisible] = useState(60);
@@ -58,7 +59,7 @@ function CollectionPage() {
     const tree = buildFolderTree(data ?? []);
     return {
       node: findFolder(tree, segments),
-      trail: segments.map((_, i) => ({
+      trail: segments.map((_seg: string, i: number) => ({
         slug: segments.slice(0, i + 1).join("/"),
         node: findFolder(tree, segments.slice(0, i + 1)),
       })),
@@ -83,7 +84,7 @@ function CollectionPage() {
     );
   }, [node, descendants, colors]);
 
-  useEffect(() => setVisible(60), [colors, params._splat]);
+  useEffect(() => setVisible(60), [colors, splat]);
 
   const toggleColor = (color: string) =>
     setColors((prev) =>
@@ -120,7 +121,7 @@ function CollectionPage() {
             <p className="text-xs uppercase tracking-widest text-accent">
               {trail
                 .slice(0, -1)
-                .map((t, i) => t.node?.name ?? segments[i])
+                .map((t: { node?: FolderNode }, i: number) => t.node?.name ?? segments[i])
                 .join(" › ")}
             </p>
           )}
