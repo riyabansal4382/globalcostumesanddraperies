@@ -8,85 +8,132 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CostumeCard } from "@/components/CostumeCard";
 import { FolderCard } from "@/components/FolderCard";
 import { FilterChip } from "@/components/FilterChip";
-import { buildFolderTree, costumesQuery, findFolder } from "@/lib/folders";
-import { swatchStyle } from "@/lib/costumes";
+import {
+  buildFolderTree,
+  costumesQuery,
+  findFolder,
+  type FolderNode,
+} from "@/lib/folders";
+import { swatchStyle, type Costume } from "@/lib/costumes";
 
-export const Route = createFileRoute("/collection/$folder/")({
+export const Route = createFileRoute("/collection/$")({
   head: ({ params }) => {
-    const title = `${params.folder.replace(/-/g, " ")} costumes — Velvet & Verve`;
+    const label = ((params as { _splat?: string })._splat ?? "")
+      .split("/")
+      .filter(Boolean)
+      .at(-1)
+      ?.replace(/-/g, " ");
+    const title = `${label ?? "Collection"} — Velvet & Verve costume hire`;
+    const description = `Every ${label ?? "costume"} piece in our wardrobe, photographed and ready to hire.`;
     return {
       meta: [
         { title },
-        {
-          name: "description",
-          content: `Browse every photographed piece in our ${params.folder.replace(/-/g, " ")} collection, ready to hire.`,
-        },
+        { name: "description", content: description },
         { property: "og:title", content: title },
-        {
-          property: "og:description",
-          content: `Browse every photographed piece in our ${params.folder.replace(/-/g, " ")} collection, ready to hire.`,
-        },
+        { property: "og:description", content: description },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
       ],
     };
   },
-  component: FolderPage,
+  component: CollectionPage,
 });
 
-function FolderPage() {
-  const { folder: slug } = Route.useParams();
+/** Every photo in this folder and all of its sub-folders. */
+function allItems(node: FolderNode): Costume[] {
+  return [...node.items, ...node.children.flatMap(allItems)];
+}
+
+function CollectionPage() {
+  const params = Route.useParams() as { _splat?: string };
+  const splat = params._splat ?? "";
+  const segments = useMemo<string[]>(
+    () => splat.split("/").filter(Boolean),
+    [splat],
+  );
   const { data, isLoading } = useQuery(costumesQuery);
   const [visible, setVisible] = useState(60);
   const [colors, setColors] = useState<string[]>([]);
 
-  const node = useMemo(() => {
+  const { node, trail } = useMemo(() => {
     const tree = buildFolderTree(data ?? []);
-    return findFolder(tree, [slug]);
-  }, [data, slug]);
+    return {
+      node: findFolder(tree, segments),
+      trail: segments.map((_seg: string, i: number) => ({
+        slug: segments.slice(0, i + 1).join("/"),
+        node: findFolder(tree, segments.slice(0, i + 1)),
+      })),
+    };
+  }, [data, segments]);
+
+  const descendants = useMemo(() => (node ? allItems(node) : []), [node]);
 
   const colorFacets = useMemo(() => {
     const set = new Set<string>();
-    for (const item of node?.items ?? []) {
-      item.colors.forEach((c) => set.add(c));
-    }
+    for (const item of descendants) item.colors.forEach((c) => set.add(c));
     return [...set].sort();
-  }, [node]);
+  }, [descendants]);
 
+  // With no colour filter we show the photos sitting directly in this folder;
+  // filtering searches the whole sub-tree so tagged photos deeper down surface.
   const filteredItems = useMemo(() => {
     if (!node) return [];
     if (!colors.length) return node.items;
-    return node.items.filter((item) =>
+    return descendants.filter((item) =>
       item.colors.some((c) => colors.includes(c)),
     );
-  }, [node, colors]);
+  }, [node, descendants, colors]);
 
-  useEffect(() => setVisible(60), [colors]);
+  useEffect(() => setVisible(60), [colors, splat]);
 
   const toggleColor = (color: string) =>
     setColors((prev) =>
       prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color],
     );
 
+  const parentSplat = segments.slice(0, -1).join("/");
+  const parentName = trail.at(-2)?.node?.name;
+
   return (
     <main className="min-h-screen bg-background">
       <header className="stage-gradient">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6">
-          <Link to="/" className="font-display text-xl font-semibold text-primary-foreground">
+          <Link
+            to="/"
+            className="font-display text-xl font-semibold text-primary-foreground"
+          >
             Velvet &amp; Verve
           </Link>
           <Button asChild variant="secondary" size="sm">
-            <Link to="/">
-              <ArrowLeft className="size-4" /> All collections
-            </Link>
+            {parentSplat ? (
+              <Link to="/collection/$" params={{ _splat: parentSplat }}>
+                <ArrowLeft className="size-4" /> {parentName ?? "Back"}
+              </Link>
+            ) : (
+              <Link to="/">
+                <ArrowLeft className="size-4" /> All collections
+              </Link>
+            )}
           </Button>
         </nav>
         <div className="mx-auto max-w-6xl px-5 pb-12">
-          <h1 className="font-display text-4xl text-primary-foreground">
-            {node?.name ?? slug.replace(/-/g, " ")}
+          {trail.length > 1 && (
+            <p className="text-xs uppercase tracking-widest text-accent">
+              {trail
+                .slice(0, -1)
+                .map((t: { node: FolderNode | undefined }, i: number) => t.node?.name ?? segments[i])
+                .join(" › ")}
+            </p>
+          )}
+          <h1 className="mt-2 font-display text-4xl text-primary-foreground">
+            {node?.name ?? segments.at(-1)?.replace(/-/g, " ")}
           </h1>
           <p className="mt-2 text-sm text-primary-foreground/75">
-            {node ? `${node.total} photos` : isLoading ? "Loading…" : "Collection not found"}
+            {node
+              ? `${node.total} photos`
+              : isLoading
+                ? "Loading…"
+                : "Collection not found"}
           </p>
         </div>
         <div className="curtain-rule h-1.5 w-full opacity-70" />
@@ -105,17 +152,19 @@ function FolderPage() {
           </p>
         ) : (
           <>
-            {node.children.length > 0 && (
+            {node.children.length > 0 && colors.length === 0 && (
               <>
                 <h2 className="text-xl">Sub-collections</h2>
-                <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-4 mb-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {node.children.map((child) => (
                     <FolderCard
                       key={child.slug}
                       folder={child}
                       linkProps={{
-                        to: "/collection/$folder/$sub",
-                        params: { folder: node.slug, sub: child.slug },
+                        to: "/collection/$",
+                        params: {
+                          _splat: [...segments, child.slug].join("/"),
+                        },
                       }}
                     />
                   ))}
@@ -124,21 +173,29 @@ function FolderPage() {
             )}
 
             {colorFacets.length > 0 && (
-              <div className={node.children.length > 0 ? "mt-12" : ""}>
+              <>
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <h2 className="text-xl">
-                    {node.children.length > 0 ? `More ${node.name}` : "Photos"}
+                    {colors.length > 0 ? "Matching photos" : "Photos"}
                     {colors.length > 0 && ` — ${filteredItems.length} match`}
                   </h2>
                   {colors.length > 0 && (
-                    <Button variant="ghost" size="sm" onClick={() => setColors([])}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setColors([])}
+                    >
                       Clear colour filter
                     </Button>
                   )}
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {colorFacets.map((c) => (
-                    <FilterChip key={c} active={colors.includes(c)} onClick={() => toggleColor(c)}>
+                    <FilterChip
+                      key={c}
+                      active={colors.includes(c)}
+                      onClick={() => toggleColor(c)}
+                    >
                       <span
                         className="size-3.5 rounded-full border border-border"
                         style={swatchStyle(c)}
@@ -147,7 +204,7 @@ function FolderPage() {
                     </FilterChip>
                   ))}
                 </div>
-              </div>
+              </>
             )}
 
             {filteredItems.length > 0 && (
@@ -158,11 +215,13 @@ function FolderPage() {
               </div>
             )}
 
-            {filteredItems.length === 0 && (
+            {filteredItems.length === 0 && (colors.length > 0 || node.children.length === 0) && (
               <div className="mt-16 text-center">
-                <p className="font-display text-2xl">No photos match this colour</p>
+                <p className="font-display text-2xl">
+                  {colors.length ? "No photos match this colour" : "No photos here yet"}
+                </p>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Try clearing the filter or browsing a sub-collection.
+                  Try clearing the filter or opening a sub-collection.
                 </p>
               </div>
             )}

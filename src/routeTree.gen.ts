@@ -13,9 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as CollectionSplatRouteImport } from './routes/collection.$'
 import { Route as ApiPublicOnedriveImageRouteImport } from './routes/api/public/onedrive-image'
-import { Route as CollectionFolderIndexRouteImport } from './routes/collection.$folder.index'
-import { Route as CollectionFolderSubRouteImport } from './routes/collection.$folder.$sub'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -36,19 +35,14 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const CollectionSplatRoute = CollectionSplatRouteImport.update({
+  id: '/collection/$',
+  path: '/collection/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicOnedriveImageRoute = ApiPublicOnedriveImageRouteImport.update({
   id: '/api/public/onedrive-image',
   path: '/api/public/onedrive-image',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CollectionFolderIndexRoute = CollectionFolderIndexRouteImport.update({
-  id: '/collection/$folder/',
-  path: '/collection/$folder/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CollectionFolderSubRoute = CollectionFolderSubRouteImport.update({
-  id: '/collection/$folder/$sub',
-  path: '/collection/$folder/$sub',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -56,17 +50,15 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/collection/$': typeof CollectionSplatRoute
   '/api/public/onedrive-image': typeof ApiPublicOnedriveImageRoute
-  '/collection/$folder/$sub': typeof CollectionFolderSubRoute
-  '/collection/$folder/': typeof CollectionFolderIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/collection/$': typeof CollectionSplatRoute
   '/api/public/onedrive-image': typeof ApiPublicOnedriveImageRoute
-  '/collection/$folder/$sub': typeof CollectionFolderSubRoute
-  '/collection/$folder': typeof CollectionFolderIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -74,45 +66,31 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/collection/$': typeof CollectionSplatRoute
   '/api/public/onedrive-image': typeof ApiPublicOnedriveImageRoute
-  '/collection/$folder/$sub': typeof CollectionFolderSubRoute
-  '/collection/$folder/': typeof CollectionFolderIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/auth'
-    | '/admin'
-    | '/api/public/onedrive-image'
-    | '/collection/$folder/$sub'
-    | '/collection/$folder/'
+    '/' | '/auth' | '/admin' | '/collection/$' | '/api/public/onedrive-image'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/auth'
-    | '/admin'
-    | '/api/public/onedrive-image'
-    | '/collection/$folder/$sub'
-    | '/collection/$folder'
+  to: '/' | '/auth' | '/admin' | '/collection/$' | '/api/public/onedrive-image'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/admin'
+    | '/collection/$'
     | '/api/public/onedrive-image'
-    | '/collection/$folder/$sub'
-    | '/collection/$folder/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CollectionSplatRoute: typeof CollectionSplatRoute
   ApiPublicOnedriveImageRoute: typeof ApiPublicOnedriveImageRoute
-  CollectionFolderSubRoute: typeof CollectionFolderSubRoute
-  CollectionFolderIndexRoute: typeof CollectionFolderIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -145,25 +123,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/collection/$': {
+      id: '/collection/$'
+      path: '/collection/$'
+      fullPath: '/collection/$'
+      preLoaderRoute: typeof CollectionSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/onedrive-image': {
       id: '/api/public/onedrive-image'
       path: '/api/public/onedrive-image'
       fullPath: '/api/public/onedrive-image'
       preLoaderRoute: typeof ApiPublicOnedriveImageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/collection/$folder/': {
-      id: '/collection/$folder/'
-      path: '/collection/$folder'
-      fullPath: '/collection/$folder/'
-      preLoaderRoute: typeof CollectionFolderIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/collection/$folder/$sub': {
-      id: '/collection/$folder/$sub'
-      path: '/collection/$folder/$sub'
-      fullPath: '/collection/$folder/$sub'
-      preLoaderRoute: typeof CollectionFolderSubRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -184,20 +155,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  CollectionSplatRoute: CollectionSplatRoute,
   ApiPublicOnedriveImageRoute: ApiPublicOnedriveImageRoute,
-  CollectionFolderSubRoute: CollectionFolderSubRoute,
-  CollectionFolderIndexRoute: CollectionFolderIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
