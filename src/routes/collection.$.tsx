@@ -121,7 +121,7 @@ function CollectionPage() {
             <p className="text-xs uppercase tracking-widest text-accent">
               {trail
                 .slice(0, -1)
-                .map((t: { node?: FolderNode }, i: number) => t.node?.name ?? segments[i])
+                .map((t: { node: FolderNode | undefined }, i: number) => t.node?.name ?? segments[i])
                 .join(" › ")}
             </p>
           )}
