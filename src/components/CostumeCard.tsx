@@ -5,10 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { swatchStyle, type Costume } from "@/lib/costumes";
+import { pathSegments } from "@/lib/folders";
 
 export function CostumeCard({ costume }: { costume: Costume }) {
   const { add, has, setOpen } = useCart();
   const inCart = has(costume.id);
+  const segments = pathSegments(costume.source_path);
+  const collection = segments.at(-1) ?? costume.category;
+
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-stage transition-all hover:-translate-y-1 hover:shadow-lift">
@@ -47,7 +51,7 @@ export function CostumeCard({ costume }: { costume: Costume }) {
         )}
 
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary">{costume.category}</Badge>
+          <Badge variant="secondary">{collection}</Badge>
           {costume.sizes.map((s) => (
             <Badge key={s} variant="outline">
               {s}
@@ -56,17 +60,22 @@ export function CostumeCard({ costume }: { costume: Costume }) {
         </div>
 
         {costume.colors.length > 0 && (
-          <div className="flex items-center gap-1.5 pt-1">
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
             {costume.colors.map((c) => (
               <span
                 key={c}
-                title={c}
-                className="size-4 rounded-full border border-border"
-                style={swatchStyle(c)}
-              />
+                className="inline-flex items-center gap-1.5 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground"
+              >
+                <span
+                  className="size-3 rounded-full border border-border"
+                  style={swatchStyle(c)}
+                />
+                {c}
+              </span>
             ))}
           </div>
         )}
+
 
         <Button
           variant={inCart ? "secondary" : "default"}
