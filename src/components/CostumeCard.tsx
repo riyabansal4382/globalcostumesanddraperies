@@ -1,7 +1,15 @@
+import { Check, ShoppingBag } from "lucide-react";
+import { toast } from "sonner";
+
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/lib/cart";
 import { swatchStyle, type Costume } from "@/lib/costumes";
 
 export function CostumeCard({ costume }: { costume: Costume }) {
+  const { add, has, setOpen } = useCart();
+  const inCart = has(costume.id);
+
   return (
     <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-stage transition-all hover:-translate-y-1 hover:shadow-lift">
       <div className="relative aspect-4/5 overflow-hidden bg-muted">
@@ -59,6 +67,31 @@ export function CostumeCard({ costume }: { costume: Costume }) {
             ))}
           </div>
         )}
+
+        <Button
+          variant={inCart ? "secondary" : "default"}
+          size="sm"
+          className="w-full"
+          disabled={!costume.is_available}
+          onClick={() => {
+            if (inCart) {
+              setOpen(true);
+              return;
+            }
+            add(costume);
+            toast.success(`${costume.name} added to your basket`);
+          }}
+        >
+          {inCart ? (
+            <>
+              <Check className="size-4" /> In basket
+            </>
+          ) : (
+            <>
+              <ShoppingBag className="size-4" /> Add to basket
+            </>
+          )}
+        </Button>
       </div>
     </article>
   );
