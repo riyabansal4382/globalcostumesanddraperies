@@ -67,6 +67,31 @@ export function CostumeCard({ costume }: { costume: Costume }) {
             ))}
           </div>
         )}
+
+        <Button
+          variant={inCart ? "secondary" : "default"}
+          size="sm"
+          className="w-full"
+          disabled={!costume.is_available}
+          onClick={() => {
+            if (inCart) {
+              setOpen(true);
+              return;
+            }
+            add(costume);
+            toast.success(`${costume.name} added to your basket`);
+          }}
+        >
+          {inCart ? (
+            <>
+              <Check className="size-4" /> In basket
+            </>
+          ) : (
+            <>
+              <ShoppingBag className="size-4" /> Add to basket
+            </>
+          )}
+        </Button>
       </div>
     </article>
   );
