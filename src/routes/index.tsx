@@ -187,10 +187,13 @@ function Catalogue() {
           <h2 className="text-xl">
             {isLoading
               ? "Loading wardrobe…"
-              : isSearching
-                ? `${results.length} costumes`
-                : "Browse the wardrobe"}
+              : isTyping
+                ? "Searching…"
+                : isSearching
+                  ? `${results.length} ${results.length === 1 ? "costume" : "costumes"}${debouncedQuery.trim() ? ` for “${debouncedQuery.trim()}”` : ""}`
+                  : "Browse the wardrobe"}
           </h2>
+
           <div className="flex items-center gap-2">
             {activeCount > 0 && (
               <Button variant="ghost" size="sm" onClick={clearAll}>
@@ -299,12 +302,28 @@ function Catalogue() {
           </>
         ) : results.length === 0 ? (
           <div className="mt-16 text-center">
-            <p className="font-display text-2xl">Nothing matches that yet</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Try a broader search or clear a filter or two.
+            <p className="font-display text-2xl">No costumes match that yet</p>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+              We couldn’t find anything for{" "}
+              {debouncedQuery.trim() ? <strong>“{debouncedQuery.trim()}”</strong> : "those filters"}.
+              Try a shorter word, a colour like “red”, or a collection name — or clear a
+              filter or two.
             </p>
+            {(activeCount > 0 || query) && (
+              <Button
+                variant="outline"
+                className="mt-6"
+                onClick={() => {
+                  setQuery("");
+                  clearAll();
+                }}
+              >
+                Reset search &amp; filters
+              </Button>
+            )}
           </div>
         ) : (
+
           <>
             <p className="mt-8 text-sm text-muted-foreground">
               Showing {Math.min(visible, results.length)} of {results.length} costumes
