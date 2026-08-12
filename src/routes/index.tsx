@@ -12,6 +12,8 @@ import { CostumeCard } from "@/components/CostumeCard";
 import { FolderCard } from "@/components/FolderCard";
 import { FilterChip } from "@/components/FilterChip";
 import { buildFolderTree, costumesQuery } from "@/lib/folders";
+import { buildSearchIndex, searchCostumes, searchSuggestions } from "@/lib/search";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { swatchStyle, type Costume } from "@/lib/costumes";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +50,8 @@ function Catalogue() {
   const [sizes, setSizes] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [visible, setVisible] = useState(60);
+  const debouncedQuery = useDebouncedValue(query, 300);
+
 
 
   const costumes = useMemo(() => data ?? [], [data]);
@@ -68,38 +72,35 @@ function Catalogue() {
     };
   }, [costumes]);
 
-  const suggestions = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (q.length < 1) return [];
-    const pool = new Set<string>();
-    for (const item of costumes) {
-      if (item.name.toLowerCase().includes(q)) pool.add(item.name);
-      item.tags.forEach((t) => {
-        if (t.toLowerCase().includes(q)) pool.add(t);
-      });
-      if (item.category.toLowerCase().includes(q)) pool.add(item.category);
-    }
-    return [...pool].slice(0, 6);
-  }, [query, costumes]);
+  const searchIndex = useMemo(() => buildSearchIndex(costumes), [costumes]);
+
+  const suggestions = useMemo(
+    () => (query.trim() ? searchSuggestions(searchIndex, query) : []),
+    [query, searchIndex],
+  );
 
   const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return costumes.filter((item) => {
-      const haystack = [item.name, item.description, item.category, ...item.tags]
-        .join(" ")
-        .toLowerCase();
-      if (q && !haystack.includes(q)) return false;
+    const base = debouncedQuery.trim()
+      ? searchCostumes(searchIndex, debouncedQuery)
+      : costumes;
+    return base.filter((item) => {
       if (colors.length && !colors.some((c) => item.colors.includes(c))) return false;
       if (categories.length && !categories.includes(item.category)) return false;
       if (sizes.length && !sizes.some((s) => item.sizes.includes(s))) return false;
       return true;
     });
-  }, [costumes, query, colors, categories, sizes]);
+  }, [costumes, searchIndex, debouncedQuery, colors, categories, sizes]);
 
-  useEffect(() => setVisible(60), [query, colors, categories, sizes]);
+  useEffect(() => setVisible(60), [debouncedQuery, colors, categories, sizes]);
 
   const folders = useMemo(() => buildFolderTree(costumes), [costumes]);
-  const isSearching = query.trim().length > 0 || colors.length > 0 || categories.length > 0 || sizes.length > 0;
+  const isSearching =
+    debouncedQuery.trim().length > 0 ||
+    colors.length > 0 ||
+    categories.length > 0 ||
+    sizes.length > 0;
+  const isTyping = query.trim() !== debouncedQuery.trim();
+
 
 
 
