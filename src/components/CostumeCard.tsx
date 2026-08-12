@@ -1,4 +1,9 @@
+import { Check, ShoppingBag } from "lucide-react";
+import { toast } from "sonner";
+
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/lib/cart";
 import { swatchStyle, type Costume } from "@/lib/costumes";
 
 export function CostumeCard({ costume }: { costume: Costume }) {
