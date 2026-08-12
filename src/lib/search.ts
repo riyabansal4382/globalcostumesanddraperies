@@ -24,14 +24,14 @@ function editDistance(a: string, b: string, max: number) {
     let best = i;
     for (let j = 1; j <= b.length; j++) {
       const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      const v = Math.min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost);
+      const v = Math.min(prev[j]! + 1, curr[j - 1]! + 1, prev[j - 1]! + cost);
       curr[j] = v;
       if (v < best) best = v;
     }
     if (best > max) return max + 1;
     prev = curr;
   }
-  return prev[b.length];
+  return prev[b.length]!;
 }
 
 /** Score a single token against a single field value. Higher is better, 0 = no match. */
@@ -47,7 +47,7 @@ function scoreField(q: string, field: string) {
     const tolerance = q.length <= 4 ? 1 : q.length <= 7 ? 2 : 3;
     // Compare against a prefix of the field so "sari" ~ "saree".
     const window = field.slice(0, q.length + tolerance);
-    const d = editDistance(q, window, tolerance);
+    const d = editDistance(q, window, tolerance) ?? tolerance + 1;
     if (d <= tolerance) return 45 - d * 8;
     if (isSubsequence(q, field)) return 25;
   }
@@ -131,7 +131,7 @@ export function searchSuggestions(index: Indexed[], query: string, limit = 6) {
     ];
     for (const [normed, label] of candidates) {
       if (!normed || !label) continue;
-      const s = scoreField(tokens[tokens.length - 1], normed);
+      const s = scoreField(tokens[tokens.length - 1] ?? "", normed);
       if (s > 0 && (seen.get(label) ?? 0) < s) seen.set(label, s);
     }
   }
