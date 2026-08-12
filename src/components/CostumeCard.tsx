@@ -7,6 +7,9 @@ import { useCart } from "@/lib/cart";
 import { swatchStyle, type Costume } from "@/lib/costumes";
 
 export function CostumeCard({ costume }: { costume: Costume }) {
+  const { add, has, setOpen } = useCart();
+  const inCart = has(costume.id);
+
   return (
     <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-stage transition-all hover:-translate-y-1 hover:shadow-lift">
       <div className="relative aspect-4/5 overflow-hidden bg-muted">
