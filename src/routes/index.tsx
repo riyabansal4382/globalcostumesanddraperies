@@ -12,6 +12,8 @@ import { CostumeCard } from "@/components/CostumeCard";
 import { FolderCard } from "@/components/FolderCard";
 import { FilterChip } from "@/components/FilterChip";
 import { buildFolderTree, costumesQuery } from "@/lib/folders";
+import { buildSearchIndex, searchCostumes, searchSuggestions } from "@/lib/search";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { swatchStyle, type Costume } from "@/lib/costumes";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +50,8 @@ function Catalogue() {
   const [sizes, setSizes] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [visible, setVisible] = useState(60);
+  const debouncedQuery = useDebouncedValue(query, 300);
+
 
 
   const costumes = useMemo(() => data ?? [], [data]);
@@ -68,38 +72,35 @@ function Catalogue() {
     };
   }, [costumes]);
 
-  const suggestions = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (q.length < 1) return [];
-    const pool = new Set<string>();
-    for (const item of costumes) {
-      if (item.name.toLowerCase().includes(q)) pool.add(item.name);
-      item.tags.forEach((t) => {
-        if (t.toLowerCase().includes(q)) pool.add(t);
-      });
-      if (item.category.toLowerCase().includes(q)) pool.add(item.category);
-    }
-    return [...pool].slice(0, 6);
-  }, [query, costumes]);
+  const searchIndex = useMemo(() => buildSearchIndex(costumes), [costumes]);
+
+  const suggestions = useMemo(
+    () => (query.trim() ? searchSuggestions(searchIndex, query) : []),
+    [query, searchIndex],
+  );
 
   const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return costumes.filter((item) => {
-      const haystack = [item.name, item.description, item.category, ...item.tags]
-        .join(" ")
-        .toLowerCase();
-      if (q && !haystack.includes(q)) return false;
+    const base = debouncedQuery.trim()
+      ? searchCostumes(searchIndex, debouncedQuery)
+      : costumes;
+    return base.filter((item) => {
       if (colors.length && !colors.some((c) => item.colors.includes(c))) return false;
       if (categories.length && !categories.includes(item.category)) return false;
       if (sizes.length && !sizes.some((s) => item.sizes.includes(s))) return false;
       return true;
     });
-  }, [costumes, query, colors, categories, sizes]);
+  }, [costumes, searchIndex, debouncedQuery, colors, categories, sizes]);
 
-  useEffect(() => setVisible(60), [query, colors, categories, sizes]);
+  useEffect(() => setVisible(60), [debouncedQuery, colors, categories, sizes]);
 
   const folders = useMemo(() => buildFolderTree(costumes), [costumes]);
-  const isSearching = query.trim().length > 0 || colors.length > 0 || categories.length > 0 || sizes.length > 0;
+  const isSearching =
+    debouncedQuery.trim().length > 0 ||
+    colors.length > 0 ||
+    categories.length > 0 ||
+    sizes.length > 0;
+  const isTyping = query.trim() !== debouncedQuery.trim();
+
 
 
 
@@ -186,10 +187,13 @@ function Catalogue() {
           <h2 className="text-xl">
             {isLoading
               ? "Loading wardrobe…"
-              : isSearching
-                ? `${results.length} costumes`
-                : "Browse the wardrobe"}
+              : isTyping
+                ? "Searching…"
+                : isSearching
+                  ? `${results.length} ${results.length === 1 ? "costume" : "costumes"}${debouncedQuery.trim() ? ` for “${debouncedQuery.trim()}”` : ""}`
+                  : "Browse the wardrobe"}
           </h2>
+
           <div className="flex items-center gap-2">
             {activeCount > 0 && (
               <Button variant="ghost" size="sm" onClick={clearAll}>
@@ -298,12 +302,28 @@ function Catalogue() {
           </>
         ) : results.length === 0 ? (
           <div className="mt-16 text-center">
-            <p className="font-display text-2xl">Nothing matches that yet</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Try a broader search or clear a filter or two.
+            <p className="font-display text-2xl">No costumes match that yet</p>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+              We couldn’t find anything for{" "}
+              {debouncedQuery.trim() ? <strong>“{debouncedQuery.trim()}”</strong> : "those filters"}.
+              Try a shorter word, a colour like “red”, or a collection name — or clear a
+              filter or two.
             </p>
+            {(activeCount > 0 || query) && (
+              <Button
+                variant="outline"
+                className="mt-6"
+                onClick={() => {
+                  setQuery("");
+                  clearAll();
+                }}
+              >
+                Reset search &amp; filters
+              </Button>
+            )}
           </div>
         ) : (
+
           <>
             <p className="mt-8 text-sm text-muted-foreground">
               Showing {Math.min(visible, results.length)} of {results.length} costumes
