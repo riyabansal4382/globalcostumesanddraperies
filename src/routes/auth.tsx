@@ -11,12 +11,12 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Staff sign in — Velvet & Verve" },
-      { name: "description", content: "Sign in to manage the Velvet & Verve costume catalogue." },
-      { property: "og:title", content: "Staff sign in — Velvet & Verve" },
+      { title: "Staff sign in — Global Costumes & Draperies" },
+      { name: "description", content: "Sign in to manage the Global Costumes & Draperies costume catalogue." },
+      { property: "og:title", content: "Staff sign in — Global Costumes & Draperies" },
       {
         property: "og:description",
-        content: "Sign in to manage the Velvet & Verve costume catalogue.",
+        content: "Sign in to manage the Global Costumes & Draperies costume catalogue.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

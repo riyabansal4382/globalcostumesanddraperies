@@ -23,7 +23,7 @@ export const Route = createFileRoute("/collection/$")({
       .filter(Boolean)
       .at(-1)
       ?.replace(/-/g, " ");
-    const title = `${label ?? "Collection"} — Velvet & Verve costume hire`;
+    const title = `${label ?? "Collection"} — Global Costumes & Draperies costume hire`;
     const description = `Every ${label ?? "costume"} piece in our wardrobe, photographed and ready to hire.`;
     return {
       meta: [
@@ -102,7 +102,7 @@ function CollectionPage() {
             to="/"
             className="font-display text-xl font-semibold text-primary-foreground"
           >
-            Velvet &amp; Verve
+            Global Costumes &amp; Draperies
           </Link>
           <Button asChild variant="secondary" size="sm">
             {parentSplat ? (
