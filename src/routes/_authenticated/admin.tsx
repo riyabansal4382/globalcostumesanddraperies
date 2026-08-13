@@ -27,9 +27,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Wardrobe manager — Velvet & Verve" },
+      { title: "Wardrobe manager — Global Costumes & Draperies" },
       { name: "description", content: "Add, tag and update costumes in the catalogue." },
-      { property: "og:title", content: "Wardrobe manager — Velvet & Verve" },
+      { property: "og:title", content: "Wardrobe manager — Global Costumes & Draperies" },
       { property: "og:description", content: "Add, tag and update costumes in the catalogue." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Search, X, SlidersHorizontal, Sparkles } from "lucide-react";
 
@@ -20,13 +20,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Velvet & Verve — Costume Hire Catalogue" },
+      { title: "Global Costumes & Draperies — Costume Hire Catalogue" },
       {
         name: "description",
         content:
           "Browse our full costume collection. Search by name or theme and filter by colour, category and size.",
       },
-      { property: "og:title", content: "Velvet & Verve — Costume Hire Catalogue" },
+      { property: "og:title", content: "Global Costumes & Draperies — Costume Hire Catalogue" },
       {
         property: "og:description",
         content:
@@ -123,11 +123,8 @@ function Catalogue() {
       <header className="stage-gradient relative overflow-hidden">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6">
           <span className="font-display text-xl font-semibold text-primary-foreground">
-            Velvet &amp; Verve
+            Global Costumes &amp; Draperies
           </span>
-          <Button asChild variant="secondary" size="sm">
-            <Link to="/admin">Staff area</Link>
-          </Button>
         </nav>
 
         <div className="mx-auto max-w-3xl px-5 pb-16 pt-8 text-center">
@@ -347,7 +344,7 @@ function Catalogue() {
       </section>
 
       <footer className="border-t border-border py-10 text-center text-sm text-muted-foreground">
-        Velvet &amp; Verve Costume Hire — fittings by appointment.
+        Global Costumes &amp; Draperies Costume Hire — fittings by appointment.
       </footer>
     </main>
   );
