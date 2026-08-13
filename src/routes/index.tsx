@@ -136,7 +136,7 @@ function Catalogue() {
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-pretty text-sm text-primary-foreground/75 sm:text-base">
             Every piece in our wardrobe, photographed and searchable. Type a look, then
-            narrow it down by colour, theme or size.
+            narrow it down by colour.
           </p>
 
           <div className="relative mx-auto mt-8 max-w-xl">
