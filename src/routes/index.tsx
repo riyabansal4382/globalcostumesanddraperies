@@ -125,9 +125,6 @@ function Catalogue() {
           <span className="font-display text-xl font-semibold text-primary-foreground">
             Global Costumes &amp; Draperies
           </span>
-          <Button asChild variant="secondary" size="sm">
-            <Link to="/admin">Staff area</Link>
-          </Button>
         </nav>
 
         <div className="mx-auto max-w-3xl px-5 pb-16 pt-8 text-center">
