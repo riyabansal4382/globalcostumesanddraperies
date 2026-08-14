@@ -25,6 +25,7 @@ type CartContextValue = {
   add: (costume: Costume, size?: string | null) => void;
   remove: (id: string) => void;
   setQty: (id: string, qty: number) => void;
+  setSize: (id: string, size: string) => void;
   clear: () => void;
   has: (id: string) => boolean;
   open: boolean;
@@ -88,6 +89,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const setSize = useCallback((id: string, size: string) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, size } : i)));
+  }, []);
+
   const clear = useCallback(() => setItems([]), []);
 
   const value = useMemo<CartContextValue>(() => {
@@ -103,12 +108,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       add,
       remove,
       setQty,
+      setSize,
       clear,
       has: (id: string) => items.some((i) => i.id === id),
       open,
       setOpen,
     };
-  }, [items, add, remove, setQty, clear, open]);
+  }, [items, add, remove, setQty, setSize, clear, open]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
