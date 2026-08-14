@@ -25,6 +25,7 @@ type CartContextValue = {
   add: (costume: Costume, size?: string | null) => void;
   remove: (id: string) => void;
   setQty: (id: string, qty: number) => void;
+  setSize: (id: string, size: string) => void;
   clear: () => void;
   has: (id: string) => boolean;
   open: boolean;
@@ -86,6 +87,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         ? prev.filter((i) => i.id !== id)
         : prev.map((i) => (i.id === id ? { ...i, qty } : i)),
     );
+  }, []);
+
+  const setSize = useCallback((id: string, size: string) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, size } : i)));
   }, []);
 
   const clear = useCallback(() => setItems([]), []);
