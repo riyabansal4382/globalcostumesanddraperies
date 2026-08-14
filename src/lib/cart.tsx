@@ -108,12 +108,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       add,
       remove,
       setQty,
+      setSize,
       clear,
       has: (id: string) => items.some((i) => i.id === id),
       open,
       setOpen,
     };
-  }, [items, add, remove, setQty, clear, open]);
+  }, [items, add, remove, setQty, setSize, clear, open]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
