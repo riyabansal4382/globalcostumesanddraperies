@@ -1,4 +1,5 @@
-import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
+import { MessageCircle, Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -10,10 +11,12 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useCart } from "@/lib/cart";
+import { CheckoutDialog } from "@/components/CheckoutDialog";
 
 export function CartDrawer() {
   const { items, count, total, setQty, remove, clear, open, setOpen } =
     useCart();
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   return (
     <>
@@ -121,7 +124,15 @@ export function CartDrawer() {
                   <span className="font-display text-lg">£{total.toFixed(0)}</span>
                 </div>
               )}
-              <Button className="w-full">Request these costumes</Button>
+              <Button
+                className="w-full"
+                onClick={() => {
+                  setOpen(false);
+                  setCheckoutOpen(true);
+                }}
+              >
+                <MessageCircle className="size-4" /> Checkout on WhatsApp
+              </Button>
               <Button variant="ghost" className="w-full" onClick={clear}>
                 <Trash2 className="size-4" /> Empty basket
               </Button>
@@ -129,6 +140,8 @@ export function CartDrawer() {
           )}
         </SheetContent>
       </Sheet>
+
+      <CheckoutDialog open={checkoutOpen} onOpenChange={setCheckoutOpen} />
     </>
   );
 }
