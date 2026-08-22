@@ -126,7 +126,7 @@ export function CheckoutDialog({
                     <Input
                       id={`size-${item.id}`}
                       value={item.size ?? ""}
-                      placeholder="e.g. M"
+                      placeholder="e.g. 30"
                       onChange={(e) => setSize(item.id, e.target.value)}
                     />
                   </div>
