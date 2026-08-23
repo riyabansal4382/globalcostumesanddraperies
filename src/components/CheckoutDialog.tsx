@@ -79,8 +79,11 @@ export function CheckoutDialog({
     if (notes.trim()) lines.push(`Notes: ${notes.trim()}`);
     if (mode === "enquire") lines.push("(Just enquiring for now — no booking yet.)");
 
-    window.open(whatsappLink(lines.join("\n")), "_blank", "noopener,noreferrer");
-    onOpenChange(false);
+    const url = openWhatsApp(lines.join("\n"));
+    setFallbackLink(url);
+    toast.success("Opening WhatsApp…", {
+      description: "If nothing opened, tap the WhatsApp link below.",
+    });
   }
 
   return (
