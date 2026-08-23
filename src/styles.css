@@ -6,7 +6,7 @@
 
 /*
  * Global Costumes & Draperies design system.
- * Crimson & Spice: warm crimson, terracotta and marigold.
+ * Indian Bazaar: deep maroon, marigold saffron, gold and emerald on ivory.
  * All colors are oklch tokens. Never hardcode colors in components.
  */
 
@@ -53,80 +53,80 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-display: "Fraunces", Georgia, serif;
+  --font-display: "Marcellus", "Fraunces", Georgia, serif;
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
-  --shadow-stage: 0 18px 40px -18px oklch(0.4 0.18 17 / 0.3);
-  --shadow-lift: 0 28px 60px -24px oklch(0.4 0.18 17 / 0.4);
+  --shadow-stage: 0 18px 40px -18px oklch(0.35 0.14 30 / 0.28);
+  --shadow-lift: 0 28px 60px -24px oklch(0.35 0.14 30 / 0.4);
 }
 
 :root {
   --radius: 0.9rem;
-  --background: oklch(0.985 0.012 30);
-  --foreground: oklch(0.22 0.06 17);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.06 17);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.06 17);
-  --primary: oklch(0.505 0.186 17.1);
-  --primary-foreground: oklch(0.99 0.01 95);
-  --secondary: oklch(0.94 0.04 30);
-  --secondary-foreground: oklch(0.32 0.12 17);
-  --muted: oklch(0.96 0.02 30);
-  --muted-foreground: oklch(0.52 0.06 17);
-  --accent: oklch(0.646 0.195 23.8);
-  --accent-foreground: oklch(0.99 0.01 95);
-  --highlight: oklch(0.838 0.143 46.5);
-  --highlight-foreground: oklch(0.26 0.09 30);
+  --background: oklch(0.985 0.022 85);
+  --foreground: oklch(0.24 0.06 30);
+  --card: oklch(0.998 0.008 85);
+  --card-foreground: oklch(0.24 0.06 30);
+  --popover: oklch(0.998 0.008 85);
+  --popover-foreground: oklch(0.24 0.06 30);
+  --primary: oklch(0.44 0.16 22);
+  --primary-foreground: oklch(0.985 0.03 85);
+  --secondary: oklch(0.945 0.045 80);
+  --secondary-foreground: oklch(0.34 0.11 30);
+  --muted: oklch(0.955 0.03 82);
+  --muted-foreground: oklch(0.5 0.05 40);
+  --accent: oklch(0.74 0.165 62);
+  --accent-foreground: oklch(0.26 0.08 40);
+  --highlight: oklch(0.84 0.135 88);
+  --highlight-foreground: oklch(0.28 0.08 60);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0.01 84);
-  --border: oklch(0.9 0.03 30);
-  --input: oklch(0.9 0.03 30);
-  --ring: oklch(0.55 0.2 17.1);
-  --chart-1: oklch(0.505 0.186 17.1);
-  --chart-2: oklch(0.646 0.195 23.8);
-  --chart-3: oklch(0.838 0.143 46.5);
-  --chart-4: oklch(0.396 0.131 16.7);
-  --chart-5: oklch(0.22 0.06 17);
-  --sidebar: oklch(0.97 0.02 30);
-  --sidebar-foreground: oklch(0.22 0.06 17);
-  --sidebar-primary: oklch(0.505 0.186 17.1);
-  --sidebar-primary-foreground: oklch(0.99 0.01 95);
-  --sidebar-accent: oklch(0.94 0.04 30);
-  --sidebar-accent-foreground: oklch(0.32 0.12 17);
-  --sidebar-border: oklch(0.9 0.03 30);
-  --sidebar-ring: oklch(0.55 0.2 17.1);
+  --border: oklch(0.9 0.04 75);
+  --input: oklch(0.9 0.04 75);
+  --ring: oklch(0.6 0.15 45);
+  --chart-1: oklch(0.44 0.16 22);
+  --chart-2: oklch(0.74 0.165 62);
+  --chart-3: oklch(0.84 0.135 88);
+  --chart-4: oklch(0.52 0.12 155);
+  --chart-5: oklch(0.32 0.09 30);
+  --sidebar: oklch(0.965 0.03 82);
+  --sidebar-foreground: oklch(0.24 0.06 30);
+  --sidebar-primary: oklch(0.44 0.16 22);
+  --sidebar-primary-foreground: oklch(0.985 0.03 85);
+  --sidebar-accent: oklch(0.945 0.045 80);
+  --sidebar-accent-foreground: oklch(0.34 0.11 30);
+  --sidebar-border: oklch(0.9 0.04 75);
+  --sidebar-ring: oklch(0.6 0.15 45);
 }
 
 .dark {
-  --background: oklch(0.18 0.045 17);
-  --foreground: oklch(0.96 0.014 84);
-  --card: oklch(0.24 0.038 17);
-  --card-foreground: oklch(0.96 0.014 84);
-  --popover: oklch(0.24 0.038 17);
-  --popover-foreground: oklch(0.96 0.014 84);
-  --primary: oklch(0.64 0.17 17.1);
-  --primary-foreground: oklch(0.22 0.04 17);
-  --secondary: oklch(0.29 0.04 17);
-  --secondary-foreground: oklch(0.96 0.014 84);
-  --muted: oklch(0.29 0.04 17);
-  --muted-foreground: oklch(0.74 0.03 84);
-  --accent: oklch(0.72 0.16 23.8);
-  --accent-foreground: oklch(0.22 0.04 60);
-  --highlight: oklch(0.72 0.14 46.5);
-  --highlight-foreground: oklch(0.98 0.01 84);
+  --background: oklch(0.19 0.045 30);
+  --foreground: oklch(0.96 0.02 85);
+  --card: oklch(0.25 0.045 30);
+  --card-foreground: oklch(0.96 0.02 85);
+  --popover: oklch(0.25 0.045 30);
+  --popover-foreground: oklch(0.96 0.02 85);
+  --primary: oklch(0.66 0.16 40);
+  --primary-foreground: oklch(0.2 0.05 30);
+  --secondary: oklch(0.3 0.05 35);
+  --secondary-foreground: oklch(0.96 0.02 85);
+  --muted: oklch(0.3 0.05 35);
+  --muted-foreground: oklch(0.76 0.04 80);
+  --accent: oklch(0.78 0.15 62);
+  --accent-foreground: oklch(0.22 0.05 40);
+  --highlight: oklch(0.82 0.13 88);
+  --highlight-foreground: oklch(0.24 0.06 60);
   --destructive: oklch(0.7 0.19 22);
   --destructive-foreground: oklch(0.98 0.01 84);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.64 0.17 17.1);
-  --sidebar: oklch(0.24 0.038 17);
-  --sidebar-foreground: oklch(0.96 0.014 84);
-  --sidebar-primary: oklch(0.64 0.17 17.1);
-  --sidebar-primary-foreground: oklch(0.22 0.04 17);
-  --sidebar-accent: oklch(0.29 0.04 17);
-  --sidebar-accent-foreground: oklch(0.96 0.014 84);
-  --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.64 0.17 17.1);
+  --border: oklch(1 0 0 / 14%);
+  --input: oklch(1 0 0 / 18%);
+  --ring: oklch(0.72 0.14 62);
+  --sidebar: oklch(0.25 0.045 30);
+  --sidebar-foreground: oklch(0.96 0.02 85);
+  --sidebar-primary: oklch(0.66 0.16 40);
+  --sidebar-primary-foreground: oklch(0.2 0.05 30);
+  --sidebar-accent: oklch(0.3 0.05 35);
+  --sidebar-accent-foreground: oklch(0.96 0.02 85);
+  --sidebar-border: oklch(1 0 0 / 14%);
+  --sidebar-ring: oklch(0.72 0.14 62);
 }
 
 @layer base {
@@ -151,18 +151,43 @@
 
 @utility stage-gradient {
   background-image: radial-gradient(
-      120% 90% at 15% 0%,
-      oklch(0.646 0.195 23.8 / 0.45) 0%,
+      110% 85% at 12% 0%,
+      oklch(0.74 0.165 62 / 0.5) 0%,
       transparent 55%
     ),
-    radial-gradient(100% 80% at 95% 10%, oklch(0.505 0.186 17.1 / 0.5) 0%, transparent 60%),
-    linear-gradient(160deg, oklch(0.505 0.186 17.1) 0%, oklch(0.396 0.131 16.7) 55%, oklch(0.28 0.11 17) 100%);
+    radial-gradient(95% 75% at 92% 8%, oklch(0.55 0.17 25 / 0.6) 0%, transparent 60%),
+    linear-gradient(155deg, oklch(0.42 0.15 22) 0%, oklch(0.3 0.11 25) 58%, oklch(0.22 0.07 30) 100%);
 }
 
 @utility curtain-rule {
   background-image: repeating-linear-gradient(
     90deg,
-    var(--color-accent) 0 10px,
-    var(--color-highlight) 10px 20px
+    var(--color-highlight) 0 12px,
+    var(--color-accent) 12px 24px
   );
+}
+
+/* Jaali (lattice) screen pattern used behind hero content */
+@utility jaali {
+  background-image: radial-gradient(circle at 0 0, oklch(0.84 0.135 88 / 0.22) 2px, transparent 2.5px),
+    radial-gradient(circle at 12px 12px, oklch(0.84 0.135 88 / 0.22) 2px, transparent 2.5px);
+  background-size: 24px 24px;
+}
+
+/* Gold rule with a small central diamond motif */
+@utility gold-rule {
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-highlight) 20%,
+    var(--color-accent) 50%,
+    var(--color-highlight) 80%,
+    transparent 100%
+  );
+}
+
+/* Mughal arch top on cards and image frames */
+@utility arch-top {
+  border-top-left-radius: 999px;
+  border-top-right-radius: 999px;
 }

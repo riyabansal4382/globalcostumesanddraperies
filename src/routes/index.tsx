@@ -120,23 +120,30 @@ function Catalogue() {
 
   return (
     <main className="min-h-screen bg-background">
-      <header className="stage-gradient relative overflow-hidden">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6">
-          <span className="font-display text-xl font-semibold text-primary-foreground">
+      <div className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3">
+          <span className="font-display text-lg tracking-wide text-primary sm:text-xl">
             Global Costumes &amp; Draperies
           </span>
-        </nav>
+          <span className="ml-auto hidden text-xs uppercase tracking-[0.25em] text-muted-foreground sm:block">
+            Costume hire &amp; drapery
+          </span>
+        </div>
+        <div className="gold-rule h-px w-full" />
+      </div>
 
-        <div className="mx-auto max-w-3xl px-5 pb-16 pt-8 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-3 py-1 text-xs font-medium uppercase tracking-widest text-accent">
-            <Sparkles className="size-3.5" /> Costume hire &amp; wardrobe
+      <header className="stage-gradient relative overflow-hidden">
+        <div className="jaali absolute inset-0 opacity-60" aria-hidden />
+        <div className="relative mx-auto max-w-3xl px-5 pb-14 pt-12 text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-highlight/40 bg-highlight/15 px-3 py-1 text-xs font-medium uppercase tracking-[0.25em] text-highlight">
+            <Sparkles className="size-3.5" /> Rangeen wardrobe
           </span>
           <h1 className="mt-5 text-balance font-display text-4xl leading-tight text-primary-foreground sm:text-5xl">
-            Find the costume, not the cardboard box
+            Every colour of the bazaar, ready to hire
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-pretty text-sm text-primary-foreground/75 sm:text-base">
-            Every piece in our wardrobe, photographed and searchable. Type a look, then
-            narrow it down by colour.
+          <p className="mx-auto mt-4 max-w-xl text-pretty text-sm text-primary-foreground/80 sm:text-base">
+            Sarees, sherwanis, lehengas, drapes and more — photographed and searchable.
+            Type a look, then narrow it down by colour.
           </p>
 
           <div className="relative mx-auto mt-8 max-w-xl">
@@ -144,9 +151,9 @@ function Catalogue() {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Try 'vampire', 'gold gown', 'pirate'…"
+              placeholder="Try 'saree', 'gold lehenga', 'dhoti'…"
               aria-label="Search costumes"
-              className="h-14 rounded-full border-0 bg-card pl-12 pr-12 text-base shadow-lift"
+              className="h-14 rounded-full border border-highlight/40 bg-card pl-12 pr-12 text-base shadow-lift"
             />
             {query && (
               <button
@@ -175,11 +182,35 @@ function Catalogue() {
               </div>
             )}
           </div>
+
+          {facets.colors.length > 0 && (
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+              {facets.colors.slice(0, 12).map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => toggle(c, colors, setColors)}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                    colors.includes(c)
+                      ? "border-highlight bg-highlight text-highlight-foreground"
+                      : "border-primary-foreground/25 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20",
+                  )}
+                >
+                  <span
+                    className="size-3.5 rounded-full border border-border"
+                    style={swatchStyle(c)}
+                  />
+                  {c}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-        <div className="curtain-rule h-1.5 w-full opacity-70" />
+        <div className="curtain-rule h-2 w-full" />
       </header>
 
-      <section className="mx-auto max-w-6xl px-5 py-10">
+      <section className="mx-auto max-w-7xl px-5 py-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-xl">
             {isLoading
@@ -273,7 +304,7 @@ function Catalogue() {
         </div>
 
         {isLoading ? (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 6 }).map((_, i) => (
               <Skeleton key={i} className="h-80 rounded-2xl" />
             ))}
@@ -283,7 +314,7 @@ function Catalogue() {
             <p className="mt-8 text-sm text-muted-foreground">
               {folders.length} collections — pick one to see everything inside.
             </p>
-            <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {folders.map((folder) => (
                 <FolderCard
                   key={folder.slug}
@@ -325,7 +356,7 @@ function Catalogue() {
             <p className="mt-8 text-sm text-muted-foreground">
               Showing {Math.min(visible, results.length)} of {results.length} costumes
             </p>
-            <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {results.slice(0, visible).map((costume) => (
                 <CostumeCard key={costume.id} costume={costume} />
               ))}
@@ -343,8 +374,14 @@ function Catalogue() {
 
       </section>
 
-      <footer className="border-t border-border py-10 text-center text-sm text-muted-foreground">
-        Global Costumes &amp; Draperies Costume Hire — fittings by appointment.
+      <footer className="mt-6">
+        <div className="gold-rule h-px w-full" />
+        <div className="bg-secondary/50 py-10 text-center">
+          <p className="font-display text-lg text-primary">Global Costumes &amp; Draperies</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Costume hire &amp; drapery — fittings by appointment.
+          </p>
+        </div>
       </footer>
     </main>
   );
