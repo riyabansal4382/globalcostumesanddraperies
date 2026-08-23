@@ -5,12 +5,15 @@ import { parseFromFilename } from "@/lib/costumes";
 export const importOneDriveCostumes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: isAdmin, error: roleError } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
+    const { data: roleRow, error: roleError } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId)
+      .eq("role", "admin")
+      .maybeSingle();
     if (roleError) throw new Error(roleError.message);
-    if (!isAdmin) throw new Error("Only admins can import from OneDrive.");
+    if (!roleRow) throw new Error("Only admins can import from OneDrive.");
+
 
     const { listCostumePhotos } = await import("@/lib/onedrive.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
