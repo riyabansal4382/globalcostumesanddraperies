@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/lib/cart";
-import { absoluteImageUrl, whatsappLink } from "@/lib/whatsapp";
+import { absoluteImageUrl, openWhatsApp } from "@/lib/whatsapp";
 
 type Mode = "book" | "enquire";
 
@@ -31,6 +31,7 @@ export function CheckoutDialog({
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
   const [notes, setNotes] = useState("");
+  const [fallbackLink, setFallbackLink] = useState<string | null>(null);
 
   const missingSize = items.some((i) => !i.size?.trim());
   const needsDate = mode === "book";
@@ -79,8 +80,11 @@ export function CheckoutDialog({
     if (notes.trim()) lines.push(`Notes: ${notes.trim()}`);
     if (mode === "enquire") lines.push("(Just enquiring for now — no booking yet.)");
 
-    window.open(whatsappLink(lines.join("\n")), "_blank", "noopener,noreferrer");
-    onOpenChange(false);
+    const url = openWhatsApp(lines.join("\n"));
+    setFallbackLink(url);
+    toast.success("Opening WhatsApp…", {
+      description: "If nothing opened, tap the WhatsApp link below.",
+    });
   }
 
   return (
@@ -203,6 +207,17 @@ export function CheckoutDialog({
             rows={3}
           />
         </div>
+
+        {fallbackLink && (
+          <a
+            href={fallbackLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block rounded-xl border border-primary/40 bg-primary/5 p-3 text-center text-sm font-medium text-primary underline underline-offset-4"
+          >
+            WhatsApp didn't open? Tap here to open the chat
+          </a>
+        )}
 
         <DialogFooter>
           <Button onClick={send} className="w-full">
