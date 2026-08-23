@@ -31,6 +31,7 @@ export function CheckoutDialog({
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
   const [notes, setNotes] = useState("");
+  const [fallbackLink, setFallbackLink] = useState<string | null>(null);
 
   const missingSize = items.some((i) => !i.size?.trim());
   const needsDate = mode === "book";
