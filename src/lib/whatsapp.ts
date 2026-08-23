@@ -1,6 +1,6 @@
 // Business WhatsApp number in international format, digits only (no + or spaces).
 // Example: UK 07700 900123 -> "447700900123"
-export const WHATSAPP_NUMBER = "447700900123";
+export const WHATSAPP_NUMBER = "918308504362";
 
 export function absoluteImageUrl(url: string) {
   if (!url) return "";
