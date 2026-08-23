@@ -41,6 +41,13 @@ export function pathSegments(sourcePath: string): string[] {
     .filter(Boolean);
 }
 
+/** True when the path lives inside the internal OneDrive "site" folder. */
+function isSiteFolderPath(sourcePath: string): boolean {
+  const first = pathSegments(sourcePath)[0];
+  return first?.toLowerCase() === "site";
+}
+
+
 export type FolderNode = {
   name: string;
   slug: string;
