@@ -179,13 +179,16 @@ export function CheckoutDialog({
           </div>
           <div>
             <Label htmlFor="hire-date">
-              Date required{needsDate ? "" : " (optional)"}
+              Date required{needsDate ? " (dd/mm/yyyy)" : " (optional)"}
             </Label>
             <Input
               id="hire-date"
-              type="date"
+              type="text"
+              inputMode="numeric"
+              placeholder="dd/mm/yyyy"
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(e) => setDate(formatDateInput(e.target.value))}
+              required={needsDate}
             />
           </div>
         </div>
