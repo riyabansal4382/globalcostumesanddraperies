@@ -35,13 +35,27 @@ export function CheckoutDialog({
   const missingSize = items.some((i) => !i.size?.trim());
   const needsDate = mode === "book";
 
+  const isValidDate = (value: string) => {
+    if (!value) return false;
+    return /^\d{2}\/\d{2}\/\d{4}$/.test(value);
+  };
+
+  function formatDateInput(value: string) {
+    const digits = value.replace(/\D/g, "").slice(0, 8);
+    const parts: string[] = [];
+    if (digits.length > 0) parts.push(digits.slice(0, 2));
+    if (digits.length > 2) parts.push(digits.slice(2, 4));
+    if (digits.length > 4) parts.push(digits.slice(4, 8));
+    return parts.join("/");
+  }
+
   function send() {
     if (missingSize) {
       toast.error("Please add a size for every costume.");
       return;
     }
-    if (needsDate && !date) {
-      toast.error("Please pick the date you need the costumes.");
+    if (needsDate && !isValidDate(date)) {
+      toast.error("Please enter the date in dd/mm/yyyy format.");
       return;
     }
 
@@ -165,13 +179,16 @@ export function CheckoutDialog({
           </div>
           <div>
             <Label htmlFor="hire-date">
-              Date required{needsDate ? "" : " (optional)"}
+              Date required{needsDate ? " (dd/mm/yyyy)" : " (optional)"}
             </Label>
             <Input
               id="hire-date"
-              type="date"
+              type="text"
+              inputMode="numeric"
+              placeholder="dd/mm/yyyy"
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(e) => setDate(formatDateInput(e.target.value))}
+              required={needsDate}
             />
           </div>
         </div>
