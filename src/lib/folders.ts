@@ -13,7 +13,8 @@ export async function fetchCostumes(): Promise<Costume[]> {
       .order("name", { ascending: true })
       .range(from, from + PAGE - 1);
     if (error) throw error;
-    all.push(...((data ?? []) as Costume[]));
+    const rows = (data ?? []) as Costume[];
+    all.push(...rows.filter((r) => !isSiteFolderPath(r.source_path)));
     if (!data || data.length < PAGE) break;
   }
   return all;
@@ -40,6 +41,13 @@ export function pathSegments(sourcePath: string): string[] {
     .map((s) => s.trim())
     .filter(Boolean);
 }
+
+/** True when the path lives inside the internal OneDrive "site" folder. */
+function isSiteFolderPath(sourcePath: string): boolean {
+  const first = pathSegments(sourcePath)[0];
+  return first?.toLowerCase() === "site";
+}
+
 
 export type FolderNode = {
   name: string;
