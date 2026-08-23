@@ -379,7 +379,9 @@ function Catalogue() {
         <div className="bg-secondary/50 py-10 text-center">
           <p className="font-display text-lg text-primary">Global Costumes &amp; Draperies</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Costume hire &amp; drapery — fittings by appointment.
+            <a href="tel:+918308504362" className="hover:text-primary hover:underline transition-colors">
+              +91 83085 04362
+            </a>
           </p>
         </div>
       </footer>
