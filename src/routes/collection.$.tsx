@@ -97,7 +97,7 @@ function CollectionPage() {
   return (
     <main className="min-h-screen bg-background">
       <header className="stage-gradient">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6">
+        <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6">
           <Link
             to="/"
             className="font-display text-xl font-semibold text-primary-foreground"
@@ -116,7 +116,7 @@ function CollectionPage() {
             )}
           </Button>
         </nav>
-        <div className="mx-auto max-w-6xl px-5 pb-12">
+        <div className="mx-auto max-w-7xl px-5 pb-12">
           {trail.length > 1 && (
             <p className="text-xs uppercase tracking-widest text-accent">
               {trail
@@ -136,12 +136,12 @@ function CollectionPage() {
                 : "Collection not found"}
           </p>
         </div>
-        <div className="curtain-rule h-1.5 w-full opacity-70" />
+        <div className="curtain-rule h-2 w-full" />
       </header>
 
-      <section className="mx-auto max-w-6xl px-5 py-10">
+      <section className="mx-auto max-w-7xl px-5 py-10">
         {isLoading ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 6 }).map((_, i) => (
               <Skeleton key={i} className="h-72 rounded-2xl" />
             ))}
@@ -155,7 +155,7 @@ function CollectionPage() {
             {node.children.length > 0 && colors.length === 0 && (
               <>
                 <h2 className="text-xl">Sub-collections</h2>
-                <div className="mt-4 mb-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-4 mb-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {node.children.map((child) => (
                     <FolderCard
                       key={child.slug}
@@ -208,7 +208,7 @@ function CollectionPage() {
             )}
 
             {filteredItems.length > 0 && (
-              <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {filteredItems.slice(0, visible).map((costume) => (
                   <CostumeCard key={costume.id} costume={costume} />
                 ))}

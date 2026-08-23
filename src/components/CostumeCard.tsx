@@ -15,8 +15,8 @@ export function CostumeCard({ costume }: { costume: Costume }) {
 
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-stage transition-all hover:-translate-y-1 hover:shadow-lift">
-      <div className="relative aspect-4/5 overflow-hidden bg-muted">
+    <article className="group overflow-hidden rounded-[1.75rem] border border-border bg-card shadow-stage transition-all hover:-translate-y-1 hover:border-accent/60 hover:shadow-lift">
+      <div className="relative m-2 aspect-4/5 overflow-hidden rounded-[1.4rem] rounded-t-[6rem] bg-muted ring-1 ring-highlight/40">
         {costume.image_url ? (
           <img
             src={costume.image_url}
