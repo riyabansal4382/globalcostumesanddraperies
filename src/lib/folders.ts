@@ -13,7 +13,8 @@ export async function fetchCostumes(): Promise<Costume[]> {
       .order("name", { ascending: true })
       .range(from, from + PAGE - 1);
     if (error) throw error;
-    all.push(...((data ?? []) as Costume[]));
+    const rows = (data ?? []) as Costume[];
+    all.push(...rows.filter((r) => !isSiteFolderPath(r.source_path)));
     if (!data || data.length < PAGE) break;
   }
   return all;
