@@ -208,6 +208,17 @@ export function CheckoutDialog({
           />
         </div>
 
+        {fallbackLink && (
+          <a
+            href={fallbackLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block rounded-xl border border-primary/40 bg-primary/5 p-3 text-center text-sm font-medium text-primary underline underline-offset-4"
+          >
+            WhatsApp didn't open? Tap here to open the chat
+          </a>
+        )}
+
         <DialogFooter>
           <Button onClick={send} className="w-full">
             <MessageCircle className="size-4" />
