@@ -133,18 +133,19 @@ function Catalogue() {
       </div>
 
       <header className="stage-gradient relative overflow-hidden">
-        <div className="jaali absolute inset-0 opacity-60" aria-hidden />
+        <div className="veil-sheen absolute inset-0" aria-hidden />
         <div className="relative mx-auto max-w-3xl px-5 pb-14 pt-12 text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-highlight/40 bg-highlight/15 px-3 py-1 text-xs font-medium uppercase tracking-[0.25em] text-highlight">
             <Sparkles className="size-3.5" /> Rangeen wardrobe
           </span>
           <h1 className="mt-5 text-balance font-display text-4xl leading-tight text-primary-foreground sm:text-5xl">
-            Every colour of the bazaar, ready to hire
+            Costumes from every state and every country
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-pretty text-sm text-primary-foreground/80 sm:text-base">
-            Sarees, sherwanis, lehengas, drapes and more — photographed and searchable.
+            Regional Indian dress and world costumes — photographed and searchable.
             Type a look, then narrow it down by colour.
           </p>
+
 
           <div className="relative mx-auto mt-8 max-w-xl">
             <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />

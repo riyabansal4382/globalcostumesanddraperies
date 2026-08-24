@@ -170,12 +170,16 @@
   );
 }
 
-/* Jaali (lattice) screen pattern used behind hero content */
-@utility jaali {
-  background-image: radial-gradient(circle at 0 0, oklch(0.8 0.1 45 / 0.25) 2px, transparent 2.5px),
-    radial-gradient(circle at 12px 12px, oklch(0.8 0.1 45 / 0.25) 2px, transparent 2.5px);
-  background-size: 24px 24px;
+/* Soft, dot-free sheen used behind hero content */
+@utility veil-sheen {
+  background-image: radial-gradient(
+      120% 80% at 50% -20%,
+      oklch(1 0 0 / 0.14) 0%,
+      transparent 60%
+    ),
+    linear-gradient(180deg, transparent 55%, oklch(0.2 0.03 20 / 0.28) 100%);
 }
+
 
 
 /* Gold rule with a small central diamond motif */
