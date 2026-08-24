@@ -134,6 +134,7 @@ function Catalogue() {
 
       <header className="stage-gradient relative overflow-hidden">
         <div className="veil-sheen absolute inset-0" aria-hidden />
+        <HeroAnimals />
         <div className="relative mx-auto max-w-3xl px-5 pb-14 pt-12 text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-highlight/40 bg-highlight/15 px-3 py-1 text-xs font-medium uppercase tracking-[0.25em] text-highlight">
             <Sparkles className="size-3.5" /> Rangeen wardrobe
@@ -142,9 +143,10 @@ function Catalogue() {
             Costumes from every state and every country
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-pretty text-sm text-primary-foreground/80 sm:text-base">
-            Regional Indian dress and world costumes — photographed and searchable.
+            Regional Indian dress and world costumes are photographed and searchable.
             Type a look, then narrow it down by colour.
           </p>
+
 
 
           <div className="relative mx-auto mt-8 max-w-xl">
