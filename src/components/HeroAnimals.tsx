@@ -13,13 +13,39 @@ const LION =
 const RABBIT =
   "M24 24c-2-8-1-16 2-16s5 8 4 15c3-1 6-1 9 0-1-7 1-15 4-15s4 8 2 16c5 3 8 8 8 14 0 9-8 14-18 14S17 47 17 38c0-6 3-11 7-14z";
 
+const PEACOCK =
+  "M32 54c-7 0-12-5-12-11 0-5 3-9 7-11-1-3 0-6 2-8 2-2 6-2 8 0l6-5 1 5 6-1-3 5c6 3 9 9 9 16 0 6-5 10-11 10z M26 24l-8-6 2 8-8 1 7 4z M44 22l9-5-3 8 8 2-8 3z";
+
+const HORSE =
+  "M12 54l4-18c1-6 5-10 11-12l6-2 3-7 5 3-2 5 6 4c4 3 6 7 6 12l1 15h-6l-1-13-6 3-2 10h-6l2-11-9-1-3 12z";
+
+const DEER =
+  "M22 26c-3-6-4-12-2-14l4 6 3-5 2 7 3-3 1 6c3-1 6-1 9 0l1-6 3 3 2-7 3 5 4-6c2 2 1 8-2 14 4 3 6 8 6 13 0 9-7 15-16 15s-16-6-16-15c0-5 2-10 5-13z";
+
+const BIRD =
+  "M14 40c0-9 8-16 18-16 6 0 11 2 14 6l10-3-5 8 6 3-8 3c-2 8-9 13-17 13-10 0-18-6-18-14z M20 34l-10-6 3 9-8 3 10 2z";
+
+const FISH =
+  "M8 32c8-11 20-16 32-14 8 1 14 6 16 14-2 8-8 13-16 14-12 2-24-3-32-14z M56 32l6-9v18z";
+
+const TURTLE =
+  "M14 40c0-11 8-19 18-19s18 8 18 19c0 3-1 6-2 8l-4-3-3 6-4-4-5 5-5-5-4 4-3-6-4 3c-1-2-2-5-2-8z";
+
 const shapes = [
-  { d: ELEPHANT, style: { left: "4%", top: "18%", width: "112px" }, rotate: -4 },
-  { d: CAMEL, style: { left: "24%", top: "58%", width: "84px" }, rotate: 3 },
-  { d: RABBIT, style: { right: "26%", top: "16%", width: "62px" }, rotate: -6 },
-  { d: LION, style: { right: "5%", top: "52%", width: "96px" }, rotate: 2 },
-  { d: CAMEL, style: { right: "44%", top: "8%", width: "58px" }, rotate: -8 },
-  { d: ELEPHANT, style: { left: "40%", top: "70%", width: "70px" }, rotate: 5 },
+  { d: ELEPHANT, style: { left: "3%", top: "16%", width: "116px" }, rotate: -4 },
+  { d: CAMEL, style: { left: "22%", top: "60%", width: "84px" }, rotate: 3 },
+  { d: RABBIT, style: { right: "27%", top: "14%", width: "62px" }, rotate: -6 },
+  { d: LION, style: { right: "4%", top: "50%", width: "98px" }, rotate: 2 },
+  { d: CAMEL, style: { right: "45%", top: "6%", width: "56px" }, rotate: -8 },
+  { d: ELEPHANT, style: { left: "41%", top: "72%", width: "70px" }, rotate: 5 },
+  { d: PEACOCK, style: { left: "13%", top: "38%", width: "78px" }, rotate: -3 },
+  { d: HORSE, style: { right: "17%", top: "72%", width: "88px" }, rotate: 4 },
+  { d: DEER, style: { left: "58%", top: "24%", width: "72px" }, rotate: -5 },
+  { d: BIRD, style: { left: "31%", top: "8%", width: "60px" }, rotate: 6 },
+  { d: FISH, style: { right: "9%", top: "22%", width: "66px" }, rotate: -7 },
+  { d: TURTLE, style: { left: "68%", top: "66%", width: "64px" }, rotate: 3 },
+  { d: BIRD, style: { right: "36%", top: "44%", width: "52px" }, rotate: -10 },
+  { d: PEACOCK, style: { left: "50%", top: "52%", width: "58px" }, rotate: 7 },
 ];
 
 export function HeroAnimals() {
@@ -32,6 +58,10 @@ export function HeroAnimals() {
           className="absolute text-primary-foreground/10"
           style={{ ...s.style, transform: `rotate(${s.rotate}deg)` }}
           fill="currentColor"
+          stroke="currentColor"
+          strokeWidth={1.1}
+          strokeLinejoin="round"
+          strokeOpacity={0.55}
         >
           <path d={s.d} />
         </svg>
