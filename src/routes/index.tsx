@@ -11,6 +11,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CostumeCard } from "@/components/CostumeCard";
 import { FolderCard } from "@/components/FolderCard";
 import { FilterChip } from "@/components/FilterChip";
+import { HeroAnimals } from "@/components/HeroAnimals";
+
 import { buildFolderTree, costumesQuery } from "@/lib/folders";
 import { buildSearchIndex, searchCostumes, searchSuggestions } from "@/lib/search";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
