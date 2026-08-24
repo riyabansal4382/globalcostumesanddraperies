@@ -34,30 +34,13 @@ const TURTLE =
 const shapes = [
   { d: ELEPHANT, style: { left: "3%", top: "16%", width: "116px" }, rotate: -4 },
   { d: CAMEL, style: { left: "22%", top: "60%", width: "84px" }, rotate: 3 },
-  { d: RABBIT, style: { right: "27%", top: "14%", width: "62px" }, rotate: -6 },
   { d: LION, style: { right: "4%", top: "50%", width: "98px" }, rotate: 2 },
-  { d: CAMEL, style: { right: "45%", top: "6%", width: "56px" }, rotate: -8 },
-  { d: ELEPHANT, style: { left: "41%", top: "72%", width: "70px" }, rotate: 5 },
-  { d: PEACOCK, style: { left: "13%", top: "38%", width: "78px" }, rotate: -3 },
-  { d: HORSE, style: { right: "17%", top: "72%", width: "88px" }, rotate: 4 },
-  { d: DEER, style: { left: "58%", top: "24%", width: "72px" }, rotate: -5 },
-  { d: BIRD, style: { left: "31%", top: "8%", width: "60px" }, rotate: 6 },
-  { d: FISH, style: { right: "9%", top: "22%", width: "66px" }, rotate: -7 },
-  { d: TURTLE, style: { left: "68%", top: "66%", width: "64px" }, rotate: 3 },
-  { d: BIRD, style: { right: "36%", top: "44%", width: "52px" }, rotate: -10 },
-  { d: PEACOCK, style: { left: "50%", top: "52%", width: "58px" }, rotate: 7 },
-  // bottom-left cluster
-  { d: DEER, style: { left: "6%", top: "70%", width: "74px" }, rotate: 4 },
-  { d: TURTLE, style: { left: "17%", top: "82%", width: "56px" }, rotate: -5 },
-  { d: RABBIT, style: { left: "2%", top: "86%", width: "50px" }, rotate: 8 },
-  { d: FISH, style: { left: "29%", top: "88%", width: "62px" }, rotate: -3 },
-  { d: HORSE, style: { left: "10%", top: "56%", width: "68px" }, rotate: -7 },
-  // top-right cluster
-  { d: PEACOCK, style: { right: "6%", top: "6%", width: "80px" }, rotate: -4 },
-  { d: BIRD, style: { right: "18%", top: "4%", width: "54px" }, rotate: 9 },
-  { d: ELEPHANT, style: { right: "13%", top: "32%", width: "78px" }, rotate: 3 },
-  { d: DEER, style: { right: "2%", top: "36%", width: "58px" }, rotate: -6 },
-  { d: CAMEL, style: { right: "30%", top: "26%", width: "56px" }, rotate: 5 },
+  // bottom-left
+  { d: DEER, style: { left: "7%", top: "72%", width: "74px" }, rotate: 4 },
+  { d: RABBIT, style: { left: "24%", top: "84%", width: "52px" }, rotate: 8 },
+  // top-right
+  { d: PEACOCK, style: { right: "7%", top: "7%", width: "80px" }, rotate: -4 },
+  { d: BIRD, style: { right: "24%", top: "16%", width: "54px" }, rotate: 9 },
 ];
 
 export function HeroAnimals() {
