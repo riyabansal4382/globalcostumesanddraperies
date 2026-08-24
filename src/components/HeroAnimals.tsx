@@ -32,6 +32,9 @@ const shapes = [
   // top-right
   { d: PEACOCK, style: { right: "7%", top: "7%", width: "80px" }, rotate: -4 },
   { d: BIRD, style: { right: "24%", top: "16%", width: "54px" }, rotate: 9 },
+  // bottom-right
+  { d: CAMEL, style: { right: "8%", top: "78%", width: "72px" }, rotate: -5 },
+  { d: RABBIT, style: { right: "26%", top: "86%", width: "50px" }, rotate: 6 },
 ];
 
 export function HeroAnimals() {
