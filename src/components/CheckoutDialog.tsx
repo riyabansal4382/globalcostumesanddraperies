@@ -33,8 +33,8 @@ export function CheckoutDialog({
   const [notes, setNotes] = useState("");
   const [fallbackLink, setFallbackLink] = useState<string | null>(null);
 
-  const missingSize = items.some((i) => !i.size?.trim());
   const needsDate = mode === "book";
+  const missingSize = mode === "book" && items.some((i) => !i.size?.trim());
 
   const isValidDate = (value: string) => {
     if (!value) return false;
@@ -139,7 +139,7 @@ export function CheckoutDialog({
                       htmlFor={`size-${item.id}`}
                       className="text-xs text-muted-foreground"
                     >
-                      Size required
+                      Size {mode === "book" ? "required" : "(optional)"}
                     </Label>
                     <Input
                       id={`size-${item.id}`}
