@@ -46,6 +46,18 @@ const shapes = [
   { d: TURTLE, style: { left: "68%", top: "66%", width: "64px" }, rotate: 3 },
   { d: BIRD, style: { right: "36%", top: "44%", width: "52px" }, rotate: -10 },
   { d: PEACOCK, style: { left: "50%", top: "52%", width: "58px" }, rotate: 7 },
+  // bottom-left cluster
+  { d: DEER, style: { left: "6%", top: "70%", width: "74px" }, rotate: 4 },
+  { d: TURTLE, style: { left: "17%", top: "82%", width: "56px" }, rotate: -5 },
+  { d: RABBIT, style: { left: "2%", top: "86%", width: "50px" }, rotate: 8 },
+  { d: FISH, style: { left: "29%", top: "88%", width: "62px" }, rotate: -3 },
+  { d: HORSE, style: { left: "10%", top: "56%", width: "68px" }, rotate: -7 },
+  // top-right cluster
+  { d: PEACOCK, style: { right: "6%", top: "6%", width: "80px" }, rotate: -4 },
+  { d: BIRD, style: { right: "18%", top: "4%", width: "54px" }, rotate: 9 },
+  { d: ELEPHANT, style: { right: "13%", top: "32%", width: "78px" }, rotate: 3 },
+  { d: DEER, style: { right: "2%", top: "36%", width: "58px" }, rotate: -6 },
+  { d: CAMEL, style: { right: "30%", top: "26%", width: "56px" }, rotate: 5 },
 ];
 
 export function HeroAnimals() {
