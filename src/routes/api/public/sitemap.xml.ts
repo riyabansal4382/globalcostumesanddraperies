@@ -10,12 +10,12 @@ function slugify(value: string) {
     .replace(/^-|-$/g, "");
 }
 
-export const Route = createFileRoute("/api/public/sitemap.xml")({
+export const Route = createFileRoute("/api/public/sitemap/xml")({
   server: {
     handlers: {
       GET: async () => {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-        const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+        const supabaseUrl = import.meta.env["VITE_SUPABASE_URL"] as string;
+        const anonKey = import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] as string;
 
         // Pull every source_path so we can enumerate the collection folders.
         const folders = new Set<string>();

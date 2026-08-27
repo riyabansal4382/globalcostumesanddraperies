@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CollectionSplatRouteImport } from './routes/collection.$'
 import { Route as ApiPublicOnedriveImageRouteImport } from './routes/api/public/onedrive-image'
+import { Route as ApiPublicSitemapXmlRouteImport } from './routes/api/public/sitemap.xml'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -45,6 +46,11 @@ const ApiPublicOnedriveImageRoute = ApiPublicOnedriveImageRouteImport.update({
   path: '/api/public/onedrive-image',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSitemapXmlRoute = ApiPublicSitemapXmlRouteImport.update({
+  id: '/api/public/sitemap/xml',
+  path: '/api/public/sitemap/xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/collection/$': typeof CollectionSplatRoute
   '/api/public/onedrive-image': typeof ApiPublicOnedriveImageRoute
+  '/api/public/sitemap/xml': typeof ApiPublicSitemapXmlRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/collection/$': typeof CollectionSplatRoute
   '/api/public/onedrive-image': typeof ApiPublicOnedriveImageRoute
+  '/api/public/sitemap/xml': typeof ApiPublicSitemapXmlRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,13 +76,25 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/collection/$': typeof CollectionSplatRoute
   '/api/public/onedrive-image': typeof ApiPublicOnedriveImageRoute
+  '/api/public/sitemap/xml': typeof ApiPublicSitemapXmlRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/admin' | '/collection/$' | '/api/public/onedrive-image'
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/collection/$'
+    | '/api/public/onedrive-image'
+    | '/api/public/sitemap/xml'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/admin' | '/collection/$' | '/api/public/onedrive-image'
+  to:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/collection/$'
+    | '/api/public/onedrive-image'
+    | '/api/public/sitemap/xml'
   id:
     | '__root__'
     | '/'
@@ -83,6 +103,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/collection/$'
     | '/api/public/onedrive-image'
+    | '/api/public/sitemap/xml'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -91,6 +112,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CollectionSplatRoute: typeof CollectionSplatRoute
   ApiPublicOnedriveImageRoute: typeof ApiPublicOnedriveImageRoute
+  ApiPublicSitemapXmlRoute: typeof ApiPublicSitemapXmlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -137,6 +159,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicOnedriveImageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/sitemap/xml': {
+      id: '/api/public/sitemap/xml'
+      path: '/api/public/sitemap/xml'
+      fullPath: '/api/public/sitemap/xml'
+      preLoaderRoute: typeof ApiPublicSitemapXmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -157,6 +186,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CollectionSplatRoute: CollectionSplatRoute,
   ApiPublicOnedriveImageRoute: ApiPublicOnedriveImageRoute,
+  ApiPublicSitemapXmlRoute: ApiPublicSitemapXmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
