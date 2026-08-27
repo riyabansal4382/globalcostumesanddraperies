@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://globalcostumesanddraperies.lovable.app/api/public/sitemap.xml
+Sitemap: https://globalcostumesanddraperies.lovable.app/sitemap.xml
