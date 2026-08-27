@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/lib/cart";
 import { CartDrawer } from "@/components/CartDrawer";
+import { WhatsAppFab } from "@/components/WhatsAppFab";
 
 
 function NotFoundComponent() {
@@ -133,6 +134,7 @@ function RootComponent() {
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <CartDrawer />
+        <WhatsAppFab />
       </CartProvider>
       <Toaster richColors position="top-center" />
     </QueryClientProvider>

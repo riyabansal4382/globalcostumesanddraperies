@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Search, X, SlidersHorizontal, Sparkles } from "lucide-react";
+import { Search, X, SlidersHorizontal, Sparkles, MessageCircle } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { buildSearchIndex, searchCostumes, searchSuggestions } from "@/lib/searc
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { swatchStyle, type Costume } from "@/lib/costumes";
 import { cn } from "@/lib/utils";
+import { whatsappLink } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -108,6 +109,15 @@ function Catalogue() {
   const suggestions = useMemo(
     () => (query.trim() ? searchSuggestions(searchIndex, query) : []),
     [query, searchIndex],
+  );
+
+  // Alternate spellings/related terms offered when a search comes up empty.
+  const emptySuggestions = useMemo(
+    () =>
+      debouncedQuery.trim()
+        ? searchSuggestions(searchIndex, debouncedQuery, 4)
+        : [],
+    [debouncedQuery, searchIndex],
   );
 
   const results = useMemo(() => {
@@ -371,18 +381,60 @@ function Catalogue() {
               Try a shorter word, a colour like “red”, or a collection name — or clear a
               filter or two.
             </p>
-            {(activeCount > 0 || query) && (
-              <Button
-                variant="outline"
-                className="mt-6"
-                onClick={() => {
-                  setQuery("");
-                  clearAll();
-                }}
-              >
-                Reset search &amp; filters
-              </Button>
+
+            {emptySuggestions.length > 0 && (
+              <div className="mt-6">
+                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  Did you mean
+                </p>
+                <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+                  {emptySuggestions.map((s) => (
+                    <Button
+                      key={s}
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setQuery(s)}
+                      className="gap-2 rounded-full"
+                    >
+                      <Search className="size-3.5" />
+                      {s}
+                    </Button>
+                  ))}
+                </div>
+              </div>
             )}
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              {(activeCount > 0 || query) && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setQuery("");
+                    clearAll();
+                  }}
+                >
+                  Reset search &amp; filters
+                </Button>
+              )}
+              <Button asChild className="gap-2">
+                <a
+                  href={whatsappLink(
+                    `Hi Global Costumes & Draperies! I searched your website for “${
+                      debouncedQuery.trim() || "a costume"
+                    }” but couldn't find it. Do you have something like this? I can share a photo of what I'm looking for.`,
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageCircle className="size-4" />
+                  Ask us on WhatsApp
+                </a>
+              </Button>
+            </div>
+            <p className="mx-auto mt-3 max-w-md text-xs text-muted-foreground">
+              Send us a photo of what you have in mind — our wardrobe is larger than
+              what’s photographed online.
+            </p>
           </div>
         ) : (
 
