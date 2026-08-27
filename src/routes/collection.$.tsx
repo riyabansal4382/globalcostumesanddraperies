@@ -34,6 +34,23 @@ export const Route = createFileRoute("/collection/$")({
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
       ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: title,
+            description,
+            url: `https://globalcostumesanddraperies.lovable.app/collection/${(params as { _splat?: string })._splat ?? ""}`,
+            isPartOf: {
+              "@type": "WebSite",
+              name: "Global Costumes & Draperies",
+              url: "https://globalcostumesanddraperies.lovable.app/",
+            },
+          }),
+        },
+      ],
     };
   },
   component: CollectionPage,
