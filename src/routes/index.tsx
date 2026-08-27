@@ -37,6 +37,35 @@ export const Route = createFileRoute("/")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "LocalBusiness",
+              name: "Global Costumes & Draperies",
+              description:
+                "Costume hire business. Regional Indian dress and world costumes, photographed and searchable.",
+              url: "https://globalcostumesanddraperies.lovable.app/",
+              telephone: "+918308504362",
+            },
+            {
+              "@type": "WebSite",
+              name: "Global Costumes & Draperies",
+              url: "https://globalcostumesanddraperies.lovable.app/",
+              potentialAction: {
+                "@type": "SearchAction",
+                target:
+                  "https://globalcostumesanddraperies.lovable.app/?q={search_term_string}",
+                "query-input": "required name=search_term_string",
+              },
+            },
+          ],
+        }),
+      },
+    ],
   }),
   component: Catalogue,
 });
