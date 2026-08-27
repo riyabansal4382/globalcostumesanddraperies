@@ -16,7 +16,7 @@ export function WhatsAppFab() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Enquire on WhatsApp"
-      className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 rounded-full border border-highlight/50 bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-lift transition-transform hover:scale-105 sm:bottom-6 sm:right-6"
+      className="fixed bottom-5 left-5 z-40 inline-flex items-center gap-2 rounded-full border border-highlight/50 bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-lift transition-transform hover:scale-105 sm:bottom-6 sm:left-6"
     >
       <MessageCircle className="size-5" />
       <span>Enquire on WhatsApp</span>
