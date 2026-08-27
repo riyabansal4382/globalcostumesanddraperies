@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Search, X, SlidersHorizontal, Sparkles } from "lucide-react";
+import { Search, X, SlidersHorizontal, Sparkles, MessageCircle } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { buildSearchIndex, searchCostumes, searchSuggestions } from "@/lib/searc
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { swatchStyle, type Costume } from "@/lib/costumes";
 import { cn } from "@/lib/utils";
+import { whatsappLink } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -108,6 +109,15 @@ function Catalogue() {
   const suggestions = useMemo(
     () => (query.trim() ? searchSuggestions(searchIndex, query) : []),
     [query, searchIndex],
+  );
+
+  // Alternate spellings/related terms offered when a search comes up empty.
+  const emptySuggestions = useMemo(
+    () =>
+      debouncedQuery.trim()
+        ? searchSuggestions(searchIndex, debouncedQuery, 4)
+        : [],
+    [debouncedQuery, searchIndex],
   );
 
   const results = useMemo(() => {
