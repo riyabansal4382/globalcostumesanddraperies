@@ -15,6 +15,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/lib/cart";
 import { CartDrawer } from "@/components/CartDrawer";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
+import { SiteFooter } from "@/components/SiteFooter";
 
 
 function NotFoundComponent() {
@@ -133,6 +134,7 @@ function RootComponent() {
       <CartProvider>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
+        <SiteFooter />
         <CartDrawer />
         <WhatsAppFab />
       </CartProvider>
