@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { MessageCircle } from "lucide-react";
+import { CalendarIcon, MessageCircle } from "lucide-react";
+import { format } from "date-fns";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
@@ -13,8 +15,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/lib/cart";
+import { cn } from "@/lib/utils";
 import { absoluteImageUrl, openWhatsApp } from "@/lib/whatsapp";
 
 type Mode = "book" | "enquire";
@@ -29,34 +33,21 @@ export function CheckoutDialog({
   const { items, setQty, setSize, total } = useCart();
   const [mode, setMode] = useState<Mode>("book");
   const [name, setName] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState<Date | undefined>();
+  const [dateOpen, setDateOpen] = useState(false);
   const [notes, setNotes] = useState("");
   const [fallbackLink, setFallbackLink] = useState<string | null>(null);
 
   const needsDate = mode === "book";
   const missingSize = mode === "book" && items.some((i) => !i.size?.trim());
 
-  const isValidDate = (value: string) => {
-    if (!value) return false;
-    return /^\d{2}\/\d{2}\/\d{4}$/.test(value);
-  };
-
-  function formatDateInput(value: string) {
-    const digits = value.replace(/\D/g, "").slice(0, 8);
-    const parts: string[] = [];
-    if (digits.length > 0) parts.push(digits.slice(0, 2));
-    if (digits.length > 2) parts.push(digits.slice(2, 4));
-    if (digits.length > 4) parts.push(digits.slice(4, 8));
-    return parts.join("/");
-  }
-
   function send() {
     if (missingSize) {
       toast.error("Please add a size for every costume.");
       return;
     }
-    if (needsDate && !isValidDate(date)) {
-      toast.error("Please enter the date in dd/mm/yyyy format.");
+    if (needsDate && !date) {
+      toast.error("Please pick the date you need the costumes.");
       return;
     }
 
@@ -74,7 +65,7 @@ export function CheckoutDialog({
       if (img) lines.push(`   Photo: ${img}`);
       lines.push("");
     });
-    if (date) lines.push(`Date required: ${date}`);
+    if (date) lines.push(`Date required: ${format(date, "dd/MM/yyyy")}`);
     if (total > 0) lines.push(`Estimated hire: £${total.toFixed(0)}`);
     if (name.trim()) lines.push(`Name: ${name.trim()}`);
     if (notes.trim()) lines.push(`Notes: ${notes.trim()}`);
@@ -183,17 +174,37 @@ export function CheckoutDialog({
           </div>
           <div>
             <Label htmlFor="hire-date">
-              Date required{needsDate ? " (dd/mm/yyyy)" : " (optional)"}
+              Date required{needsDate ? "" : " (optional)"}
             </Label>
-            <Input
-              id="hire-date"
-              type="text"
-              inputMode="numeric"
-              placeholder="dd/mm/yyyy"
-              value={date}
-              onChange={(e) => setDate(formatDateInput(e.target.value))}
-              required={needsDate}
-            />
+            <Popover open={dateOpen} onOpenChange={setDateOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  id="hire-date"
+                  type="button"
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !date && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarIcon className="size-4" />
+                  {date ? format(date, "dd/MM/yyyy") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(d) => {
+                    setDate(d);
+                    setDateOpen(false);
+                  }}
+                  disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                  initialFocus
+                  className="pointer-events-auto p-3"
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 
