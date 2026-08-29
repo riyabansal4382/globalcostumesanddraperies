@@ -174,17 +174,37 @@ export function CheckoutDialog({
           </div>
           <div>
             <Label htmlFor="hire-date">
-              Date required{needsDate ? " (dd/mm/yyyy)" : " (optional)"}
+              Date required{needsDate ? "" : " (optional)"}
             </Label>
-            <Input
-              id="hire-date"
-              type="text"
-              inputMode="numeric"
-              placeholder="dd/mm/yyyy"
-              value={date}
-              onChange={(e) => setDate(formatDateInput(e.target.value))}
-              required={needsDate}
-            />
+            <Popover open={dateOpen} onOpenChange={setDateOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  id="hire-date"
+                  type="button"
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !date && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarIcon className="size-4" />
+                  {date ? format(date, "dd/MM/yyyy") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(d) => {
+                    setDate(d);
+                    setDateOpen(false);
+                  }}
+                  disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                  initialFocus
+                  className="pointer-events-auto p-3"
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 
