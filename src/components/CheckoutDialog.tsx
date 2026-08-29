@@ -65,7 +65,7 @@ export function CheckoutDialog({
       if (img) lines.push(`   Photo: ${img}`);
       lines.push("");
     });
-    if (date) lines.push(`Date required: ${date}`);
+    if (date) lines.push(`Date required: ${format(date, "dd/MM/yyyy")}`);
     if (total > 0) lines.push(`Estimated hire: £${total.toFixed(0)}`);
     if (name.trim()) lines.push(`Name: ${name.trim()}`);
     if (notes.trim()) lines.push(`Notes: ${notes.trim()}`);
