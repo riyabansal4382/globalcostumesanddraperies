@@ -33,34 +33,21 @@ export function CheckoutDialog({
   const { items, setQty, setSize, total } = useCart();
   const [mode, setMode] = useState<Mode>("book");
   const [name, setName] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState<Date | undefined>();
+  const [dateOpen, setDateOpen] = useState(false);
   const [notes, setNotes] = useState("");
   const [fallbackLink, setFallbackLink] = useState<string | null>(null);
 
   const needsDate = mode === "book";
   const missingSize = mode === "book" && items.some((i) => !i.size?.trim());
 
-  const isValidDate = (value: string) => {
-    if (!value) return false;
-    return /^\d{2}\/\d{2}\/\d{4}$/.test(value);
-  };
-
-  function formatDateInput(value: string) {
-    const digits = value.replace(/\D/g, "").slice(0, 8);
-    const parts: string[] = [];
-    if (digits.length > 0) parts.push(digits.slice(0, 2));
-    if (digits.length > 2) parts.push(digits.slice(2, 4));
-    if (digits.length > 4) parts.push(digits.slice(4, 8));
-    return parts.join("/");
-  }
-
   function send() {
     if (missingSize) {
       toast.error("Please add a size for every costume.");
       return;
     }
-    if (needsDate && !isValidDate(date)) {
-      toast.error("Please enter the date in dd/mm/yyyy format.");
+    if (needsDate && !date) {
+      toast.error("Please pick the date you need the costumes.");
       return;
     }
 
