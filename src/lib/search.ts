@@ -41,7 +41,6 @@ function scoreField(q: string, field: string) {
     const window = field.slice(0, q.length + tolerance);
     const d = editDistance(q, window, tolerance) ?? tolerance + 1;
     if (d <= tolerance) return 45 - d * 8;
-    if (isSubsequence(q, field)) return 25;
   }
   return 0;
 }
