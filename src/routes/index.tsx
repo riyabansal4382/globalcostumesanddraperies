@@ -210,8 +210,18 @@ function Catalogue() {
               }}
               onFocus={() => setShowSuggestions(true)}
               onBlur={() => setShowSuggestions(false)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape" || event.key === "Enter") {
+                  setShowSuggestions(false);
+                  event.currentTarget.blur();
+                }
+              }}
+              type="search"
+              inputMode="search"
+              enterKeyHint="search"
               placeholder="Try 'saree', 'gold lehenga', 'dhoti'…"
               aria-label="Search costumes"
+              autoComplete="off"
               className="h-14 rounded-full border border-highlight/40 bg-card pl-12 pr-12 text-base shadow-lift"
             />
             {query && (
@@ -226,12 +236,13 @@ function Catalogue() {
             )}
 
             {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute inset-x-0 top-16 z-20 overflow-hidden rounded-2xl border border-border bg-popover text-left shadow-lift">
+              <div className="absolute inset-x-0 top-16 z-20 max-h-72 overflow-y-auto rounded-2xl border border-border bg-popover text-left shadow-lift">
                 {suggestions.map((s) => (
                   <button
                     key={s}
                     type="button"
                     onPointerDown={(event) => event.preventDefault()}
+                    onTouchStart={(event) => event.preventDefault()}
                     onClick={() => {
                       setQuery(s);
                       setShowSuggestions(false);
