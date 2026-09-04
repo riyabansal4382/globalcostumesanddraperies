@@ -122,6 +122,8 @@ export function searchCostumes(index: Indexed[], query: string): Costume[] {
 export function searchSuggestions(index: Indexed[], query: string, limit = 6) {
   const tokens = query.split(/\s+/).map(norm).filter(Boolean);
   if (tokens.length === 0) return [];
+  const lastToken = tokens[tokens.length - 1] ?? "";
+  const lastVariants = [lastToken, ...(SEARCH_ALIASES[lastToken] ?? [])];
   const seen = new Map<string, number>();
   for (const entry of index) {
     const candidates: [string, string][] = [
