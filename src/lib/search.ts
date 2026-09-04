@@ -138,7 +138,9 @@ export function searchSuggestions(index: Indexed[], query: string, limit = 6) {
     ];
     for (const [normed, label] of candidates) {
       if (!normed || !label) continue;
-      const s = scoreField(tokens[tokens.length - 1] ?? "", normed);
+      const s = Math.max(
+        ...lastVariants.map((variant) => scoreField(variant, normed)),
+      );
       if (s > 0 && (seen.get(label) ?? 0) < s) seen.set(label, s);
     }
   }
