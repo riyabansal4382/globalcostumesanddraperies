@@ -75,25 +75,26 @@ type ChildrenResponse = { value: DriveItem[]; "@odata.nextLink"?: string };
 
 type FolderItem = { id: string; parentReference?: { driveId?: string } };
 
-let cachedRoot: { driveId: string; itemId: string } | null = null;
+const cachedRoots = new Map<string, { driveId: string; itemId: string }>();
 
 type SharedItem = {
   name: string;
   remoteItem?: { id: string; parentReference?: { driveId?: string } };
 };
 
-/** Resolve the photo folder, in the account's own drive or a shared drive. */
-export async function resolveShareRoot() {
-  if (cachedRoot) return cachedRoot;
+/** Resolve a photo folder, in the account's own drive or a shared drive. */
+export async function resolveShareRoot(rootFolder = ROOT_FOLDER) {
+  const cached = cachedRoots.get(rootFolder);
+  if (cached) return cached;
 
   try {
     const item = await graphJson<FolderItem>(
-      `/me/drive/root:/${encodeURIComponent(ROOT_FOLDER)}?$select=id,name,parentReference`,
+      `/me/drive/root:/${encodeURIComponent(rootFolder)}?$select=id,name,parentReference`,
     );
     const driveId = item.parentReference?.driveId;
     if (driveId) {
-      cachedRoot = { driveId, itemId: item.id };
-      return cachedRoot;
+      cachedRoots.set(rootFolder, { driveId, itemId: item.id });
+      return { driveId, itemId: item.id };
     }
   } catch {
     // fall through to the shared-with-me drives below
@@ -104,18 +105,18 @@ export async function resolveShareRoot() {
     const remote = entry.remoteItem;
     const driveId = remote?.parentReference?.driveId;
     if (!remote || !driveId) continue;
-    if (entry.name === ROOT_FOLDER) {
-      cachedRoot = { driveId, itemId: remote.id };
-      return cachedRoot;
+    if (entry.name === rootFolder) {
+      cachedRoots.set(rootFolder, { driveId, itemId: remote.id });
+      return { driveId, itemId: remote.id };
     }
     const children = await listChildren(driveId, remote.id);
-    const match = children.find((c) => c.folder && c.name === ROOT_FOLDER);
+    const match = children.find((c) => c.folder && c.name === rootFolder);
     if (match) {
-      cachedRoot = { driveId, itemId: match.id };
-      return cachedRoot;
+      cachedRoots.set(rootFolder, { driveId, itemId: match.id });
+      return { driveId, itemId: match.id };
     }
   }
-  throw new Error("Could not resolve the OneDrive folder.");
+  throw new Error(`Could not resolve the OneDrive folder "${rootFolder}".`);
 }
 
 async function listChildren(driveId: string, itemId: string): Promise<DriveItem[]> {
@@ -235,10 +236,11 @@ export async function fetchImage(itemId: string) {
 /**
  * Stream a costume photo addressed by its folder/file path inside the photo
  * folder. Item ids change over time, so path addressing is the stable way to
- * reach a photo.
+ * reach a photo. Use `rootFolder` to read from a different OneDrive folder
+ * (e.g. "Tagged_Photos") without changing the default catalogue root.
  */
-export async function fetchImageByPath(sourcePath: string) {
-  const { driveId, itemId } = await resolveShareRoot();
+export async function fetchImageByPath(sourcePath: string, rootFolder = ROOT_FOLDER) {
+  const { driveId, itemId } = await resolveShareRoot(rootFolder);
   // Stored paths use " / " between nested folders.
   const clean = sourcePath
     .split(/\s*\/\s*/)
