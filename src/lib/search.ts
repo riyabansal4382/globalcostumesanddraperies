@@ -67,17 +67,31 @@ export function buildSearchIndex(costumes: Costume[]): Indexed[] {
 
 const WEIGHTS = { name: 1.4, collection: 1, color: 1.1, tag: 0.9 };
 
+/** Common spelling variants treated as the same word (e.g. "sari" = "saree"). */
+const SEARCH_ALIASES: Record<string, string[]> = {
+  sari: ["saree"],
+  saree: ["sari"],
+};
+
+function scoreToken(token: string, entry: Indexed) {
+  const variants = [token, ...(SEARCH_ALIASES[token] ?? [])];
+  let best = 0;
+  for (const q of variants) {
+    best = Math.max(best, scoreField(q, entry.name) * WEIGHTS.name);
+    for (const c of entry.collections)
+      best = Math.max(best, scoreField(q, c) * WEIGHTS.collection);
+    for (const c of entry.colors)
+      best = Math.max(best, scoreField(q, c) * WEIGHTS.color);
+    for (const t of entry.tags)
+      best = Math.max(best, scoreField(q, t) * WEIGHTS.tag);
+  }
+  return best;
+}
+
 function scoreEntry(tokens: string[], entry: Indexed) {
   let total = 0;
   for (const token of tokens) {
-    let best = 0;
-    best = Math.max(best, scoreField(token, entry.name) * WEIGHTS.name);
-    for (const c of entry.collections)
-      best = Math.max(best, scoreField(token, c) * WEIGHTS.collection);
-    for (const c of entry.colors)
-      best = Math.max(best, scoreField(token, c) * WEIGHTS.color);
-    for (const t of entry.tags)
-      best = Math.max(best, scoreField(token, t) * WEIGHTS.tag);
+    const best = scoreToken(token, entry);
     if (best === 0) return 0; // every token must match something
     total += best;
   }
