@@ -6,14 +6,6 @@ function norm(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 
-/** True when every char of `q` appears in `text` in order (typo-tolerant-ish). */
-function isSubsequence(q: string, text: string) {
-  let i = 0;
-  for (let j = 0; j < text.length && i < q.length; j++) {
-    if (text[j] === q[i]) i++;
-  }
-  return i === q.length;
-}
 
 /** Levenshtein distance, capped for speed. */
 function editDistance(a: string, b: string, max: number) {
