@@ -81,6 +81,7 @@ function Catalogue() {
   const [categories, setCategories] = useState<string[]>([]);
   const [sizes, setSizes] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [visible, setVisible] = useState(60);
   const debouncedQuery = useDebouncedValue(query, 300);
 
@@ -190,11 +191,25 @@ function Catalogue() {
 
 
 
-          <div className="relative mx-auto mt-8 max-w-xl">
+          <form
+            className="relative mx-auto mt-8 max-w-xl"
+            role="search"
+            onSubmit={(event) => {
+              event.preventDefault();
+              setQuery((current) => current.trim());
+              setShowSuggestions(false);
+              event.currentTarget.querySelector("input")?.blur();
+            }}
+          >
             <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setShowSuggestions(true);
+              }}
+              onFocus={() => setShowSuggestions(true)}
+              onBlur={() => setShowSuggestions(false)}
               placeholder="Try 'saree', 'gold lehenga', 'dhoti'…"
               aria-label="Search costumes"
               className="h-14 rounded-full border border-highlight/40 bg-card pl-12 pr-12 text-base shadow-lift"
@@ -210,13 +225,17 @@ function Catalogue() {
               </button>
             )}
 
-            {suggestions.length > 0 && (
+            {showSuggestions && suggestions.length > 0 && (
               <div className="absolute inset-x-0 top-16 z-20 overflow-hidden rounded-2xl border border-border bg-popover text-left shadow-lift">
                 {suggestions.map((s) => (
                   <button
                     key={s}
                     type="button"
-                    onClick={() => setQuery(s)}
+                    onPointerDown={(event) => event.preventDefault()}
+                    onClick={() => {
+                      setQuery(s);
+                      setShowSuggestions(false);
+                    }}
                     className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-popover-foreground transition-colors hover:bg-secondary"
                   >
                     <Search className="size-4 text-muted-foreground" />
@@ -225,7 +244,7 @@ function Catalogue() {
                 ))}
               </div>
             )}
-          </div>
+          </form>
 
           {facets.colors.length > 0 && (
             <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
