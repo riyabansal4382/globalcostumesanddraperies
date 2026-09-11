@@ -12,7 +12,9 @@ import { CostumeCard } from "@/components/CostumeCard";
 import { FolderCard } from "@/components/FolderCard";
 import { FilterChip } from "@/components/FilterChip";
 import { HeroAnimals } from "@/components/HeroAnimals";
+import { CuratedRow } from "@/components/CuratedRow";
 
+import { buildCuratedRows } from "@/lib/curated";
 import { buildFolderTree, costumesQuery } from "@/lib/folders";
 import { buildSearchIndex, searchCostumes, searchSuggestions } from "@/lib/search";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
@@ -136,6 +138,7 @@ function Catalogue() {
   useEffect(() => setVisible(60), [debouncedQuery, colors, categories, sizes]);
 
   const folders = useMemo(() => buildFolderTree(costumes), [costumes]);
+  const curatedRows = useMemo(() => buildCuratedRows(costumes), [costumes]);
   const isSearching =
     debouncedQuery.trim().length > 0 ||
     colors.length > 0 ||
@@ -385,6 +388,17 @@ function Catalogue() {
           </div>
         ) : !isSearching ? (
           <>
+            {curatedRows.length > 0 && (
+              <div className="mt-6">
+                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  Hand-picked for you
+                </p>
+                {curatedRows.map((row) => (
+                  <CuratedRow key={row.title} row={row} />
+                ))}
+                <div className="gold-rule mt-10 h-px w-full" />
+              </div>
+            )}
             <p className="mt-8 text-sm text-muted-foreground">
               {folders.length} collections — pick one to see everything inside.
             </p>

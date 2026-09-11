@@ -1,14 +1,17 @@
-import { Check, ShoppingBag } from "lucide-react";
+import { useState } from "react";
+import { Check, Maximize2, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CostumeDetailDialog } from "@/components/CostumeDetailDialog";
 import { useCart } from "@/lib/cart";
 import { swatchStyle, type Costume } from "@/lib/costumes";
 import { pathSegments } from "@/lib/folders";
 
 export function CostumeCard({ costume }: { costume: Costume }) {
   const { add, has, setOpen } = useCart();
+  const [detailOpen, setDetailOpen] = useState(false);
   const inCart = has(costume.id);
   const segments = pathSegments(costume.source_path);
   const collection = segments.at(-1) ?? costume.category;
@@ -16,7 +19,12 @@ export function CostumeCard({ costume }: { costume: Costume }) {
 
   return (
     <article className="group overflow-hidden rounded-[1.75rem] border border-border bg-card shadow-stage transition-all hover:-translate-y-1 hover:border-accent/60 hover:shadow-lift">
-      <div className="relative m-2 aspect-4/5 overflow-hidden rounded-[1.4rem] rounded-t-[6rem] bg-muted ring-1 ring-highlight/40">
+      <button
+        type="button"
+        onClick={() => setDetailOpen(true)}
+        aria-label={`View a larger photo of ${costume.name}`}
+        className="relative m-2 block aspect-4/5 w-[calc(100%-1rem)] overflow-hidden rounded-[1.4rem] rounded-t-[6rem] bg-muted ring-1 ring-highlight/40"
+      >
         {costume.image_url ? (
           <img
             src={costume.image_url}
@@ -34,7 +42,16 @@ export function CostumeCard({ costume }: { costume: Costume }) {
             Out on hire
           </span>
         )}
-      </div>
+        <span className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-background/85 px-2.5 py-1 text-xs text-foreground opacity-0 transition-opacity group-hover:opacity-100">
+          <Maximize2 className="size-3.5" /> View
+        </span>
+      </button>
+
+      <CostumeDetailDialog
+        costume={costume}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+      />
 
       <div className="space-y-3 p-4">
         <div className="flex items-start justify-between gap-3">
